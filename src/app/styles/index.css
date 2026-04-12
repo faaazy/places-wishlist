@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('../../assets/fonts/InterVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  src: url('../../assets/fonts/JetBrainsMono[wght].woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #1a1d23;
   --bg-card: #252830;
@@ -9,7 +25,8 @@
   --accent-bg: rgba(52, 211, 153, 0.15);
   --yellow: #f59e0b;
 
-  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --sans: 'Inter Variable', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
 
   font: 16px/1.5 var(--sans);
   color-scheme: dark;
