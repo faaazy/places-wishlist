@@ -5,7 +5,7 @@ import { getPlaces, savePlaces } from "@/shared/lib/storage";
 interface PlaceContextValue {
   places: Place[];
   addPlace: (place: Place) => void;
-  updatePlace: (id: string, data: Partial<Place>) => void;
+  updatePlace: (id: string, updatedPlace: Partial<Place>) => void;
   removePlace: (id: string) => void;
 }
 

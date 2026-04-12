@@ -1,19 +1,22 @@
 import { PlaceContextProvider } from "@/entities/place/model/PlaceContext";
-import "./styles/index.css";
 import "leaflet/dist/leaflet.css";
-import { useState } from "react";
-import { MapWidget } from "@/widgets/map/ui/MapWidget";
+import "./styles/index.css";
+import { MapPage } from "@/pages/map/MapPage";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { Layout } from "@/widgets/layout";
 
 function App() {
-  const [ai, setAi] = useState(0);
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout />,
+      children: [{ path: "/", element: <MapPage /> }],
+    },
+  ]);
 
   return (
     <PlaceContextProvider>
-      <h1>Hello, World!</h1>
-      <p>Amount of AI Slop generated: {ai}</p>
-      <button onClick={() => setAi(ai + 1)}>Add AI Slop</button>
-
-      <MapWidget />
+      <RouterProvider router={router} />
     </PlaceContextProvider>
   );
 }
