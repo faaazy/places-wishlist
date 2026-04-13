@@ -4,6 +4,9 @@ import { getPlaces, savePlaces } from "@/shared/lib/storage";
 
 interface PlaceContextValue {
   places: Place[];
+  newPlaceCoords: [number, number] | null;
+  startAdding: (coords: [number, number]) => void;
+  cancelAdding: () => void;
   addPlace: (place: Place) => void;
   updatePlace: (id: string, updatedPlace: Partial<Place>) => void;
   removePlace: (id: string) => void;
@@ -17,6 +20,9 @@ export const PlaceContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [places, setPlaces] = useState<Place[]>(() => getPlaces());
+  const [newPlaceCoords, setNewPlaceCoords] = useState<[number, number] | null>(
+    null,
+  );
 
   useEffect(() => {
     savePlaces(places);
@@ -39,9 +45,20 @@ export const PlaceContextProvider = ({
     );
   };
 
+  const startAdding = (coords: [number, number]) => setNewPlaceCoords(coords);
+  const cancelAdding = () => setNewPlaceCoords(null);
+
   return (
     <PlaceContext.Provider
-      value={{ places, addPlace, removePlace, updatePlace }}
+      value={{
+        places,
+        newPlaceCoords,
+        startAdding,
+        cancelAdding,
+        addPlace,
+        removePlace,
+        updatePlace,
+      }}
     >
       {children}
     </PlaceContext.Provider>

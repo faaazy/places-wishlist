@@ -1,4 +1,4 @@
-type PlaceCategory = "nature" | "city" | "food" | "culture" | "adventure";
+export type PlaceCategory = "nature" | "city" | "food" | "culture" | "adventure";
 
 type WishRating = 1 | 2 | 3 | 4 | 5;
 

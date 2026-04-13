@@ -55,6 +55,9 @@ body {
 
 main {
   background: #22242b;
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 
 a {
