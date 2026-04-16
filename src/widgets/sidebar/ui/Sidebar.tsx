@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import type { Place, PlaceCategory } from "@/entities/place/model/types";
-import { AddPlaceForm } from "./AddPlaceForm";
+import { AddPlaceForm } from "../../../features/add-place/ui/AddPlaceForm";
 
 const filterCategories: (PlaceCategory | "all")[] = [
   "all",

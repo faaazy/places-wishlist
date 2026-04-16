@@ -1,8 +1,9 @@
 import { useState, type SubmitEventHandler } from "react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import { Star } from "lucide-react";
-import type { PlaceCategory } from "@/entities/place/model/types";
+import type { PlaceCategory, WishRating } from "@/entities/place/model/types";
 import styles from "./AddPlaceForm.module.css";
+import { useAddPlace } from "../model/useAddPlace";
 
 const categories: { value: PlaceCategory; label: string }[] = [
   { value: "nature", label: "Nature" },
@@ -13,31 +14,19 @@ const categories: { value: PlaceCategory; label: string }[] = [
 ];
 
 export function AddPlaceForm() {
-  const { cancelAdding, newPlaceCoords, addPlace } = usePlaces();
+  const { cancelAdding } = usePlaces();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<PlaceCategory>("nature");
-  const [wishRating, setWishRating] = useState(3);
+  const [wishRating, setWishRating] = useState<WishRating>(3);
+
+  const { submitPlace } = useAddPlace();
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
-    if (!title.trim() || !newPlaceCoords) return;
-
-    const newPlace = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      description: description.trim(),
-      coords: newPlaceCoords,
-      category,
-      wishRating: wishRating as 1 | 2 | 3 | 4 | 5,
-      status: "wishlist" as const,
-      createdAt: new Date().toISOString(),
-    };
-
-    addPlace(newPlace);
-    cancelAdding();
+    submitPlace({ title, description, category, wishRating });
   };
 
   return (
@@ -97,7 +86,7 @@ export function AddPlaceForm() {
               size={22}
               className={`${styles.star} ${star <= wishRating ? styles.filled : ""}`}
               fill={star <= wishRating ? "currentColor" : "none"}
-              onClick={() => setWishRating(star)}
+              onClick={() => setWishRating(star as WishRating)}
             />
           ))}
         </div>

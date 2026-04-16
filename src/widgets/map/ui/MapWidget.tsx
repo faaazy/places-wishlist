@@ -11,6 +11,7 @@ import styles from "./MapWidget.module.css";
 import { LocateFixed } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import L from "leaflet";
+import { PlaceMarkers } from "@/features/place-markers";
 
 function LocationMarker() {
   const [position, setPosition] = useState<null | [number, number]>(null);
@@ -86,6 +87,8 @@ export const MapWidget = () => {
         <MapClickHandler onClick={setClickCoords} />
         <LocationMarker />
         <LocateButton />
+
+        <PlaceMarkers />
 
         {clickCoords && (
           <Popup position={clickCoords}>
