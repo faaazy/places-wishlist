@@ -6,9 +6,11 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./MapWidget.module.css";
 import { LocateFixed } from "lucide-react";
+import { usePlaces } from "@/entities/place/model/PlaceContext";
+import L from "leaflet";
 
 function LocationMarker() {
   const [position, setPosition] = useState<null | [number, number]>(null);
@@ -28,6 +30,13 @@ function LocationMarker() {
 
 function LocateButton() {
   const map = useMap();
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (btnRef.current) {
+      L.DomEvent.disableClickPropagation(btnRef.current);
+    }
+  }, []);
 
   const handleLocate = () => {
     map.locate();
@@ -38,6 +47,7 @@ function LocateButton() {
       onClick={handleLocate}
       title="Your location"
       className={styles.locateBtn}
+      ref={btnRef}
     >
       <LocateFixed size={20} />
     </button>
@@ -58,6 +68,7 @@ function MapClickHandler({
 }
 
 export const MapWidget = () => {
+  const { startAdding } = usePlaces();
   const [clickCoords, setClickCoords] = useState<[number, number] | null>(null);
 
   return (
@@ -82,10 +93,10 @@ export const MapWidget = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setClickCoords(null);
+                startAdding(clickCoords);
               }}
             >
-              Close
+              Add to wishlist
             </button>
           </Popup>
         )}

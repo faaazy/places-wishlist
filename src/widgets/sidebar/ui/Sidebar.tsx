@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Sidebar.module.css";
 import {
   CircleChevronLeft,
   CircleChevronRight,
   Search,
-  Map,
-  List,
-  User,
+  // Map,
+  // List,
+  // User,
   Star,
 } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import type { Place, PlaceCategory } from "@/entities/place/model/types";
+import { AddPlaceForm } from "./AddPlaceForm";
 
 const filterCategories: (PlaceCategory | "all")[] = [
   "all",
@@ -63,9 +64,9 @@ function PlaceCard({ place }: { place: Place }) {
 }
 
 export function Sidebar() {
-  const { places } = usePlaces();
+  // const [activeTab, setActiveTab] = useState<"map" | "list" | "profile">("map");
+  const { places, newPlaceCoords } = usePlaces();
   const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<"map" | "list" | "profile">("map");
   const [activeFilter, setActiveFilter] = useState<PlaceCategory | "all">(
     "all",
   );
@@ -79,6 +80,12 @@ export function Sidebar() {
       .includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  useEffect(() => {
+    if (newPlaceCoords !== null) {
+      setIsOpen(true);
+    }
+  }, [newPlaceCoords]);
 
   return (
     <div
@@ -95,50 +102,62 @@ export function Sidebar() {
             {isOpen ? <CircleChevronLeft /> : <CircleChevronRight />}
           </button>
         </div>
-        <div className={styles["sidebar-search"]}>
-          <div className={styles["sidebar-search-wrapper"]}>
-            <span className={styles["sidebar-search-icon"]}>
-              <Search />
-            </span>
-            <input
-              type="text"
-              placeholder="Search or add a place..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ---- Filter chips ---- */}
-      <div className={styles["sidebar-filters"]}>
-        {filterCategories.map((cat) => (
-          <button
-            key={cat}
-            className={`${styles["sidebar-filter-btn"]} ${activeFilter === cat ? styles.active : ""}`}
-            onClick={() => setActiveFilter(cat)}
-          >
-            {filterLabels[cat]}
-          </button>
-        ))}
-      </div>
-
-      {/* ---- Place cards ---- */}
-      <div className={styles["sidebar-content"]}>
-        {filteredPlaces.map((place) => (
-          <PlaceCard key={place.id} place={place} />
-        ))}
-        {filteredPlaces.length === 0 && (
-          <div className={styles["sidebar-empty"]}>
-            {places.length === 0
-              ? "No places yet. Add one on the map!"
-              : "No places match your filters."}
+        {newPlaceCoords === null && (
+          <div className={styles["sidebar-search"]}>
+            <div className={styles["sidebar-search-wrapper"]}>
+              <span className={styles["sidebar-search-icon"]}>
+                <Search />
+              </span>
+              <input
+                type="text"
+                placeholder="Search or add a place..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         )}
       </div>
 
+      {/* ---- Filter chips ---- */}
+      {newPlaceCoords === null && (
+        <div className={styles["sidebar-filters"]}>
+          {filterCategories.map((cat) => (
+            <button
+              key={cat}
+              className={`${styles["sidebar-filter-btn"]} ${activeFilter === cat ? styles.active : ""}`}
+              onClick={() => setActiveFilter(cat)}
+            >
+              {filterLabels[cat]}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ---- Place cards ---- */}
+
+      {newPlaceCoords !== null ? (
+        <AddPlaceForm />
+      ) : (
+        <div className={styles["sidebar-content"]}>
+          {filteredPlaces.map((place) => (
+            <PlaceCard key={place.id} place={place} />
+          ))}
+          {filteredPlaces.length === 0 && (
+            <div className={styles["sidebar-empty"]}>
+              {places.length === 0
+                ? "No places yet. Add one on the map!"
+                : "No places match your filters."}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ---- Bottom nav ---- */}
-      <div className={styles["sidebar-links"]}>
+
+      {/* ill get rid of it for now cuz its uzeless atp */}
+
+      {/* <div className={styles["sidebar-links"]}>
         <div
           className={`${styles["sidebar-link"]} ${activeTab === "map" ? styles.active : ""}`}
         >
@@ -163,7 +182,7 @@ export function Sidebar() {
             <span>Profile</span>
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

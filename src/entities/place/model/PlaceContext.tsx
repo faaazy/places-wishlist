@@ -4,10 +4,10 @@ import { getPlaces, savePlaces } from "@/shared/lib/storage";
 
 interface PlaceContextValue {
   places: Place[];
+  addPlace: (place: Place) => void;
   newPlaceCoords: [number, number] | null;
   startAdding: (coords: [number, number]) => void;
   cancelAdding: () => void;
-  addPlace: (place: Place) => void;
   updatePlace: (id: string, updatedPlace: Partial<Place>) => void;
   removePlace: (id: string) => void;
 }
@@ -52,10 +52,10 @@ export const PlaceContextProvider = ({
     <PlaceContext.Provider
       value={{
         places,
+        addPlace,
         newPlaceCoords,
         startAdding,
         cancelAdding,
-        addPlace,
         removePlace,
         updatePlace,
       }}
