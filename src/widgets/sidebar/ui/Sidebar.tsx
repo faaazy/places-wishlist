@@ -137,7 +137,9 @@ export function Sidebar() {
       {/* ---- Place cards ---- */}
 
       {newPlaceCoords !== null ? (
-        <AddPlaceForm />
+        <div className={styles["sidebar-content"]}>
+          <AddPlaceForm />
+        </div>
       ) : (
         <div className={styles["sidebar-content"]}>
           {filteredPlaces.map((place) => (
