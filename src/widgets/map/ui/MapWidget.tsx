@@ -12,6 +12,7 @@ import { LocateFixed } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import L from "leaflet";
 import { PlaceMarkers } from "@/features/place-markers";
+import { useNavigate, useSearchParams } from "react-router";
 
 function LocationMarker() {
   const [position, setPosition] = useState<null | [number, number]>(null);
@@ -60,11 +61,31 @@ function MapClickHandler({
 }: {
   onClick: (coords: [number, number]) => void;
 }) {
+  const navigate = useNavigate();
+
   useMapEvents({
     click(e) {
       onClick([e.latlng.lat, e.latlng.lng]);
+      navigate(".", { replace: true });
     },
   });
+  return null;
+}
+
+function FlyToSelectedPlace() {
+  const map = useMap();
+  const { places } = usePlaces();
+  const [searchParams] = useSearchParams();
+  const placeId = searchParams.get("placeId");
+
+  const foundPlace = places.find((place) => place.id === placeId);
+
+  useEffect(() => {
+    if (foundPlace) {
+      map.flyTo(foundPlace.coords, 15);
+    }
+  }, [foundPlace, map]);
+
   return null;
 }
 
@@ -89,6 +110,8 @@ export const MapWidget = () => {
         <LocateButton />
 
         <PlaceMarkers />
+
+        <FlyToSelectedPlace />
 
         {clickCoords && (
           <Popup position={clickCoords}>

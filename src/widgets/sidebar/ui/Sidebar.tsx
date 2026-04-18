@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import type { Place, PlaceCategory } from "@/entities/place/model/types";
-import { AddPlaceForm } from "../../../features/add-place/ui/AddPlaceForm";
+import { AddPlaceForm } from "@/features/add-place/ui/AddPlaceForm";
+import { useNavigate } from "react-router";
 
 const filterCategories: (PlaceCategory | "all")[] = [
   "all",
@@ -32,8 +33,13 @@ const filterLabels: Record<string, string> = {
 };
 
 function PlaceCard({ place }: { place: Place }) {
+  const navigate = useNavigate();
+
   return (
-    <div className={styles["sidebar-card"]}>
+    <div
+      className={styles["sidebar-card"]}
+      onClick={() => navigate("?placeId=" + place.id)}
+    >
       <div className={styles["place-info"]}>
         <div className={styles["place-name"]}>{place.title}</div>
         <div className={styles["place-location"]}>{place.category}</div>
@@ -54,7 +60,7 @@ function PlaceCard({ place }: { place: Place }) {
       </div>
       <div className={`${styles["place-status"]} ${styles[place.status]}`}>
         {place.status === "visited"
-          ? "Visited ✓"
+          ? "Visited"
           : place.status === "skipped"
             ? "Skipped"
             : "Wishlist"}
