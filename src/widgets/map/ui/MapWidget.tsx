@@ -105,8 +105,11 @@ export const MapWidget = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
         <MapClickHandler onClick={setClickCoords} />
+
         <LocationMarker />
+
         <LocateButton />
 
         <PlaceMarkers />
