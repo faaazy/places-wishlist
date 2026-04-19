@@ -118,15 +118,18 @@ export const MapWidget = () => {
 
         {clickCoords && (
           <Popup position={clickCoords}>
-            <p>Want to visit!</p>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                startAdding(clickCoords);
-              }}
-            >
-              Add to wishlist
-            </button>
+            <div className={styles.clickPopup}>
+              <p className={styles.clickPopupTitle}>Want to visit!</p>
+              <button
+                className={styles.clickPopupBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  startAdding(clickCoords);
+                }}
+              >
+                Add to wishlist
+              </button>
+            </div>
           </Popup>
         )}
       </MapContainer>

@@ -60,3 +60,35 @@
 :global(.leaflet-control-zoom a:last-child) {
   border-bottom: none !important;
 }
+
+/* Click popup */
+.clickPopup {
+  text-align: center;
+}
+
+.clickPopupTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 12px 0;
+}
+
+.clickPopupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clickPopupBtn:hover {
+  background: var(--accent);
+  color: #1a1d23;
+}
