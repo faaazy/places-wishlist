@@ -33,7 +33,7 @@ function createIcon(category: PlaceCategory) {
 }
 
 export function PlaceMarkers() {
-  const { places, removePlace } = usePlaces();
+  const { places, removePlace, startEditing } = usePlaces();
   const navigate = useNavigate();
 
   const markerRefs = useRef<Record<string, L.Marker>>({});
@@ -66,7 +66,9 @@ export function PlaceMarkers() {
             <div className={styles.popup}>
               <div className={styles.popupHeader}>
                 <h3 className={styles.popupTitle}>{place.title}</h3>
-                <span className={`${styles.popupCategory} ${styles[place.category]}`}>
+                <span
+                  className={`${styles.popupCategory} ${styles[place.category]}`}
+                >
                   {place.category}
                 </span>
               </div>
@@ -80,14 +82,21 @@ export function PlaceMarkers() {
                   <Star
                     key={i}
                     size={12}
-                    className={i < place.wishRating ? styles.starFilled : styles.starEmpty}
+                    className={
+                      i < place.wishRating
+                        ? styles.starFilled
+                        : styles.starEmpty
+                    }
                     fill={i < place.wishRating ? "currentColor" : "none"}
                   />
                 ))}
               </div>
 
               <div className={styles.popupActions}>
-                <button className={`${styles.popupBtn} ${styles.edit}`}>
+                <button
+                  className={`${styles.popupBtn} ${styles.edit}`}
+                  onClick={() => startEditing(place.id)}
+                >
                   <Pencil size={14} />
                   Edit
                 </button>

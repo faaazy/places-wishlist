@@ -7,20 +7,32 @@ type AddPlaceData = Pick<
 >;
 
 export const useAddPlace = () => {
-  const { addPlace, newPlaceCoords, cancelAdding } = usePlaces();
+  const {
+    addPlace,
+    newPlaceCoords,
+    cancelAdding,
+    editingPlaceId,
+    cancelEditing,
+    updatePlace,
+  } = usePlaces();
 
   const submitPlace = (data: AddPlaceData) => {
-    if (!newPlaceCoords) return;
+    if (editingPlaceId) {
+      updatePlace(editingPlaceId, data);
+      cancelEditing();
+    } else if (newPlaceCoords) {
+      addPlace({
+        id: crypto.randomUUID(),
+        ...data,
+        coords: newPlaceCoords,
+        status: "wishlist" as const,
+        createdAt: new Date().toISOString(),
+      });
 
-    addPlace({
-      id: crypto.randomUUID(),
-      ...data,
-      coords: newPlaceCoords,
-      status: "wishlist" as const,
-      createdAt: new Date().toISOString(),
-    });
-
-    cancelAdding();
+      cancelAdding();
+    } else {
+      return null;
+    }
   };
 
   return { submitPlace };

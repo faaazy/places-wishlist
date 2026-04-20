@@ -14,12 +14,22 @@ const categories: { value: PlaceCategory; label: string }[] = [
 ];
 
 export function AddPlaceForm() {
-  const { cancelAdding } = usePlaces();
+  const { cancelAdding, editingPlaceId, places, cancelEditing } = usePlaces();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<PlaceCategory>("nature");
-  const [wishRating, setWishRating] = useState<WishRating>(3);
+  const editingPlace = editingPlaceId
+    ? places.find((place) => place.id == editingPlaceId)
+    : null;
+
+  const [title, setTitle] = useState(editingPlace?.title ?? "");
+  const [description, setDescription] = useState(
+    editingPlace?.description ?? "",
+  );
+  const [category, setCategory] = useState<PlaceCategory>(
+    editingPlace?.category ?? "nature",
+  );
+  const [wishRating, setWishRating] = useState<WishRating>(
+    editingPlace?.wishRating ?? 3,
+  );
 
   const { submitPlace } = useAddPlace();
 
@@ -95,12 +105,15 @@ export function AddPlaceForm() {
 
       <div className={styles.actions}>
         <button type="submit" className={styles.submitBtn}>
-          Add to wishlist
+          {editingPlaceId !== null ? "Confirm" : "Add to wishlist"}
         </button>
         <button
           type="button"
           className={styles.cancelBtn}
-          onClick={cancelAdding}
+          onClick={() => {
+            cancelAdding();
+            cancelEditing();
+          }}
         >
           Cancel
         </button>

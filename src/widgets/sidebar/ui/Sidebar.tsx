@@ -71,7 +71,7 @@ function PlaceCard({ place }: { place: Place }) {
 
 export function Sidebar() {
   // const [activeTab, setActiveTab] = useState<"map" | "list" | "profile">("map");
-  const { places, newPlaceCoords } = usePlaces();
+  const { places, newPlaceCoords, editingPlaceId } = usePlaces();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [activeFilter, setActiveFilter] = useState<PlaceCategory | "all">(
     "all",
@@ -142,7 +142,7 @@ export function Sidebar() {
 
       {/* ---- Place cards ---- */}
 
-      {newPlaceCoords !== null ? (
+      {newPlaceCoords !== null || editingPlaceId !== null ? (
         <div className={styles["sidebar-content"]}>
           <AddPlaceForm />
         </div>

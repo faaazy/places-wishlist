@@ -5,11 +5,14 @@ import { getPlaces, savePlaces } from "@/shared/lib/storage";
 interface PlaceContextValue {
   places: Place[];
   addPlace: (place: Place) => void;
+  removePlace: (id: string) => void;
   newPlaceCoords: [number, number] | null;
   startAdding: (coords: [number, number]) => void;
   cancelAdding: () => void;
   updatePlace: (id: string, updatedPlace: Partial<Place>) => void;
-  removePlace: (id: string) => void;
+  editingPlaceId: string | null;
+  startEditing: (id: string) => void;
+  cancelEditing: () => void;
 }
 
 const PlaceContext = createContext<PlaceContextValue | null>(null);
@@ -23,6 +26,7 @@ export const PlaceContextProvider = ({
   const [newPlaceCoords, setNewPlaceCoords] = useState<[number, number] | null>(
     null,
   );
+  const [editingPlaceId, setEditingPlaceId] = useState<string | null>(null);
 
   useEffect(() => {
     savePlaces(places);
@@ -48,6 +52,9 @@ export const PlaceContextProvider = ({
   const startAdding = (coords: [number, number]) => setNewPlaceCoords(coords);
   const cancelAdding = () => setNewPlaceCoords(null);
 
+  const startEditing = (id: string) => setEditingPlaceId(id);
+  const cancelEditing = () => setEditingPlaceId(null);
+
   return (
     <PlaceContext.Provider
       value={{
@@ -58,6 +65,9 @@ export const PlaceContextProvider = ({
         cancelAdding,
         removePlace,
         updatePlace,
+        cancelEditing,
+        startEditing,
+        editingPlaceId,
       }}
     >
       {children}

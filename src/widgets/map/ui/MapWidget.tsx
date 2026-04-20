@@ -19,7 +19,7 @@ function LocationMarker() {
   const map = useMapEvents({
     locationfound(e) {
       setPosition([e.latlng.lat, e.latlng.lng]);
-      map.flyTo(e.latlng, map.getZoom());
+      map.flyTo(e.latlng, 15);
     },
   });
 
