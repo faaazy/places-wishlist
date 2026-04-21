@@ -40,6 +40,15 @@
 
 * {
   box-sizing: border-box;
+  font-family: var(--sans);
+}
+
+button {
+  font-family: var(--sans);
+}
+
+input, textarea {
+  font-family: var(--sans);
 }
 
 body {
@@ -91,4 +100,8 @@ ul {
 
 .leaflet-popup-close-button {
   color: #6b6f83 !important;
+}
+
+.leaflet-container {
+  font-family: var(--sans);
 }

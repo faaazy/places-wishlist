@@ -70,7 +70,6 @@ function PlaceCard({ place }: { place: Place }) {
 }
 
 export function Sidebar() {
-  // const [activeTab, setActiveTab] = useState<"map" | "list" | "profile">("map");
   const { places, newPlaceCoords, editingPlaceId } = usePlaces();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [activeFilter, setActiveFilter] = useState<PlaceCategory | "all">(
@@ -88,10 +87,11 @@ export function Sidebar() {
   });
 
   useEffect(() => {
-    if (newPlaceCoords !== null) {
+    if (newPlaceCoords ?? editingPlaceId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOpen(true);
     }
-  }, [newPlaceCoords]);
+  }, [newPlaceCoords, editingPlaceId]);
 
   return (
     <div
@@ -125,23 +125,22 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* ---- Filter chips ---- */}
+      {/* ---- Filter tabs ---- */}
       {newPlaceCoords === null && (
         <div className={styles["sidebar-filters"]}>
-          {filterCategories.map((cat) => (
+          {filterCategories.map((categ) => (
             <button
-              key={cat}
-              className={`${styles["sidebar-filter-btn"]} ${activeFilter === cat ? styles.active : ""}`}
-              onClick={() => setActiveFilter(cat)}
+              key={categ}
+              className={`${styles["sidebar-filter-btn"]} ${activeFilter === categ ? styles.active : ""}`}
+              onClick={() => setActiveFilter(categ)}
             >
-              {filterLabels[cat]}
+              {filterLabels[categ]}
             </button>
           ))}
         </div>
       )}
 
       {/* ---- Place cards ---- */}
-
       {newPlaceCoords !== null || editingPlaceId !== null ? (
         <div className={styles["sidebar-content"]}>
           <AddPlaceForm />
@@ -160,37 +159,6 @@ export function Sidebar() {
           )}
         </div>
       )}
-
-      {/* ---- Bottom nav ---- */}
-
-      {/* ill get rid of it for now cuz its uzeless atp */}
-
-      {/* <div className={styles["sidebar-links"]}>
-        <div
-          className={`${styles["sidebar-link"]} ${activeTab === "map" ? styles.active : ""}`}
-        >
-          <button onClick={() => setActiveTab("map")}>
-            <Map />
-            <span>Map</span>
-          </button>
-        </div>
-        <div
-          className={`${styles["sidebar-link"]} ${activeTab === "list" ? styles.active : ""}`}
-        >
-          <button onClick={() => setActiveTab("list")}>
-            <List />
-            <span>List</span>
-          </button>
-        </div>
-        <div
-          className={`${styles["sidebar-link"]} ${activeTab === "profile" ? styles.active : ""}`}
-        >
-          <button onClick={() => setActiveTab("profile")}>
-            <User />
-            <span>Profile</span>
-          </button>
-        </div>
-      </div> */}
     </div>
   );
 }
