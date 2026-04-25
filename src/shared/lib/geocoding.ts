@@ -12,9 +12,7 @@ export interface SearchResult {
 }
 
 export function parseCoords(input: string): Coords | null {
-  const trimmed = input.trim();
-
-  const parts = trimmed.split(/[,\s]+/);
+  const parts = input.trim().split(/[,\s]+/);
 
   if (parts.length !== 2) return null;
 
@@ -31,11 +29,6 @@ export async function searchPlace(query: string): Promise<SearchResult[]> {
   const encoded = encodeURIComponent(query.trim());
   const res = await fetch(
     `${NOMINATIM_URL}search?q=${encoded}&format=json&limit=5`,
-    {
-      headers: {
-        "User-Agent": "PlacesWishlist/1.0",
-      },
-    },
   );
 
   const data = await res.json();
@@ -45,4 +38,17 @@ export async function searchPlace(query: string): Promise<SearchResult[]> {
     lon: parseFloat(item.lon),
     display_name: item.display_name,
   }));
+}
+
+export async function reverseGeocode(
+  lat: number,
+  lon: number,
+): Promise<SearchResult[]> {
+  const res = await fetch(
+    `${NOMINATIM_URL}reverse?format=geojson&lat=${lat}&lon=${lon}&layer=address`,
+  );
+
+  const data = await res.json();
+
+  return [{ lat, lon, display_name: data[0].features.display_name }];
 }
