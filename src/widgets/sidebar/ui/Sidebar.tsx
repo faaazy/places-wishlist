@@ -13,6 +13,9 @@ import { usePlaces } from "@/entities/place/model/PlaceContext";
 import type { Place, PlaceCategory } from "@/entities/place/model/types";
 import { AddPlaceForm } from "@/features/add-place/ui/AddPlaceForm";
 import { useNavigate } from "react-router";
+import { usePlaceSearch } from "@/shared/lib/usePlaceSearch";
+import type { SearchResult } from "@/shared/lib/geocoding";
+import { SearchDropdown } from "@/shared/ui/SearchDropdown";
 
 const filterCategories: (PlaceCategory | "all")[] = [
   "all",
@@ -76,6 +79,9 @@ export function Sidebar() {
     "all",
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+  const { results } = usePlaceSearch(searchQuery);
 
   const filteredPlaces = places.filter((place) => {
     const matchesFilter =
@@ -92,6 +98,26 @@ export function Sidebar() {
       setIsOpen(true);
     }
   }, [newPlaceCoords, editingPlaceId]);
+
+  const searchChangeHandler = (value: string) => {
+    setSearchQuery(value);
+    const hasMatches = places.some((place) =>
+      place.title.toLowerCase().includes(value.toLowerCase()),
+    );
+    setShowDropdown(value.length > 0 && !hasMatches);
+  };
+
+  const selectResultHandler = (result: SearchResult) => {
+    // TODO: fly to coords;
+    console.log(result);
+
+    setShowDropdown(false);
+    setSearchQuery("");
+  };
+
+  const closeDropdownHandler = () => {
+    setShowDropdown(false);
+  };
 
   return (
     <div
@@ -118,8 +144,15 @@ export function Sidebar() {
                 type="text"
                 placeholder="Search or add a place..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => searchChangeHandler(e.target.value)}
               />
+              {showDropdown && results.length > 0 && (
+                <SearchDropdown
+                  results={results}
+                  onSelect={selectResultHandler}
+                  onClose={closeDropdownHandler}
+                />
+              )}
             </div>
           </div>
         )}
