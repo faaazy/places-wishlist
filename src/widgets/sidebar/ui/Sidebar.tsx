@@ -73,7 +73,7 @@ function PlaceCard({ place }: { place: Place }) {
 }
 
 export function Sidebar() {
-  const { places, newPlaceCoords, editingPlaceId } = usePlaces();
+  const { places, newPlaceCoords, editingPlaceId, flyTo } = usePlaces();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [activeFilter, setActiveFilter] = useState<PlaceCategory | "all">(
     "all",
@@ -108,9 +108,9 @@ export function Sidebar() {
   };
 
   const selectResultHandler = (result: SearchResult) => {
-    // TODO: fly to coords;
-    console.log(result);
-
+    if (result.lat != null && result.lon != null) {
+      flyTo?.(result.lat, result.lon, 15);
+    }
     setShowDropdown(false);
     setSearchQuery("");
   };

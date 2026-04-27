@@ -89,6 +89,22 @@ function FlyToSelectedPlace() {
   return null;
 }
 
+function FlyToCallbackSetter() {
+  const { setFlyTo } = usePlaces();
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+    setFlyTo((lat, lon, zoom) => {
+      if (typeof lat !== "number" || typeof lon !== "number") return;
+      map.flyTo([lat, lon], zoom);
+    });
+    return () => setFlyTo(null);
+  }, [map, setFlyTo]);
+
+  return null;
+}
+
 export const MapWidget = () => {
   const { startAdding } = usePlaces();
   const [clickCoords, setClickCoords] = useState<[number, number] | null>(null);
@@ -115,6 +131,8 @@ export const MapWidget = () => {
         <PlaceMarkers />
 
         <FlyToSelectedPlace />
+
+        <FlyToCallbackSetter />
 
         {clickCoords && (
           <Popup position={clickCoords}>

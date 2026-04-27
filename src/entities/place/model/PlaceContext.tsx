@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from "react";
 import type { Place } from "./types";
 import { getPlaces, savePlaces } from "@/shared/lib/storage";
 
@@ -13,6 +13,10 @@ interface PlaceContextValue {
   editingPlaceId: string | null;
   startEditing: (id: string) => void;
   cancelEditing: () => void;
+  flyTo: ((lat: number, lon: number, zoom: number) => void) | null;
+  setFlyTo: (
+    callback: ((lat: number, lon: number, zoom: number) => void) | null,
+  ) => void;
 }
 
 const PlaceContext = createContext<PlaceContextValue | null>(null);
@@ -27,6 +31,8 @@ export const PlaceContextProvider = ({
     null,
   );
   const [editingPlaceId, setEditingPlaceId] = useState<string | null>(null);
+  const flyToRef = useRef<((lat: number, lon: number, zoom: number) => void) | null>(null);
+  const [, forceRender] = useState({});
 
   useEffect(() => {
     savePlaces(places);
@@ -55,6 +61,14 @@ export const PlaceContextProvider = ({
   const startEditing = (id: string) => setEditingPlaceId(id);
   const cancelEditing = () => setEditingPlaceId(null);
 
+  const setFlyTo = useCallback(
+    (callback: ((lat: number, lon: number, zoom: number) => void) | null) => {
+      flyToRef.current = callback;
+      forceRender({});
+    },
+    [],
+  );
+
   return (
     <PlaceContext.Provider
       value={{
@@ -68,6 +82,8 @@ export const PlaceContextProvider = ({
         cancelEditing,
         startEditing,
         editingPlaceId,
+        flyTo: flyToRef.current,
+        setFlyTo,
       }}
     >
       {children}

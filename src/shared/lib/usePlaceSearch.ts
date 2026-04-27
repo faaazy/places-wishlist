@@ -16,47 +16,64 @@ export function usePlaceSearch(query: string) {
     placesRef.current = places;
   }, [places]);
 
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    let cancelled = false;
-
-    async function doSearch() {
-      const coords = parseCoords(query);
-      if (coords) {
-        const address = await reverseGeocode(coords.lat, coords.lon);
-
-        if (!cancelled) {
-          setResults(address);
-        }
-
-        return;
-      }
-
-      const filteredPlaces = placesRef.current.filter((place) => {
-        return place.title.toLowerCase().includes(query.toLowerCase());
-      });
-
-      const placeResults: SearchResult[] = filteredPlaces.map((place) => ({
-        lat: place.coords[0],
-        lon: place.coords[1],
-        display_name: place.title,
-      }));
-
-      if (filteredPlaces.length < 3) {
-        const apiResults = await searchPlace(query);
-        if (!cancelled) {
-          setResults([...placeResults, ...apiResults].slice(0, 5));
-        }
-      } else {
-        setResults(placeResults.slice(0, 5));
-      }
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
 
-    if (query.trim()) {
-      doSearch();
+    if (!query.trim) {
+      setResults([]);
+      return;
     }
+
+    debounceTimerRef.current = setTimeout(async () => {
+      let cancelled = false;
+
+      async function doSearch() {
+        const coords = parseCoords(query);
+        if (coords) {
+          const address = await reverseGeocode(coords.lat, coords.lon);
+
+          if (!cancelled) {
+            setResults(address);
+          }
+
+          return;
+        }
+
+        const filteredPlaces = placesRef.current.filter((place) => {
+          return place.title.toLowerCase().includes(query.toLowerCase());
+        });
+
+        const placeResults: SearchResult[] = filteredPlaces.map((place) => ({
+          lat: place.coords[0],
+          lon: place.coords[1],
+          display_name: place.title,
+        }));
+
+        if (filteredPlaces.length < 3) {
+          const apiResults = await searchPlace(query);
+          if (!cancelled) {
+            setResults([...placeResults, ...apiResults].slice(0, 5));
+          }
+        } else {
+          setResults(placeResults.slice(0, 5));
+        }
+      }
+
+      await doSearch();
+
+      return () => {
+        cancelled = true;
+      };
+    }, 500);
 
     return () => {
-      cancelled = true;
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
   }, [query]);
 
