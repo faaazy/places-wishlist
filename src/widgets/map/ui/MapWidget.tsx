@@ -106,7 +106,7 @@ function FlyToCallbackSetter() {
 }
 
 export const MapWidget = () => {
-  const { startAdding } = usePlaces();
+  const { startAdding, searchPopup, confirmSearchAdd } = usePlaces();
   const [clickCoords, setClickCoords] = useState<[number, number] | null>(null);
 
   return (
@@ -134,7 +134,24 @@ export const MapWidget = () => {
 
         <FlyToCallbackSetter />
 
-        {clickCoords && (
+        {searchPopup && (
+          <Popup position={searchPopup.coords}>
+            <div className={styles.clickPopup}>
+              <p className={styles.clickPopupTitle}>{searchPopup.title}</p>
+              <button
+                className={styles.clickPopupBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  confirmSearchAdd();
+                }}
+              >
+                Add to wishlist
+              </button>
+            </div>
+          </Popup>
+        )}
+
+        {clickCoords && !searchPopup && (
           <Popup position={clickCoords}>
             <div className={styles.clickPopup}>
               <p className={styles.clickPopupTitle}>Want to visit!</p>

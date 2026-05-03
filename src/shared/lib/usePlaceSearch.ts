@@ -5,72 +5,44 @@ import {
   searchPlace,
   type SearchResult,
 } from "./geocoding";
-import { usePlaces } from "@/entities/place/model/PlaceContext";
 
 export function usePlaceSearch(query: string) {
   const [results, setResults] = useState<SearchResult[]>([]);
-  const { places } = usePlaces();
-
-  const placesRef = useRef(places);
-  useEffect(() => {
-    placesRef.current = places;
-  }, [places]);
 
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelledRef = useRef(false);
 
   useEffect(() => {
+    cancelledRef.current = false;
+
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    if (!query.trim) {
+    if (!query.trim()) {
       setResults([]);
       return;
     }
 
     debounceTimerRef.current = setTimeout(async () => {
-      let cancelled = false;
+      const coords = parseCoords(query); // ???
 
-      async function doSearch() {
-        const coords = parseCoords(query);
-        if (coords) {
-          const address = await reverseGeocode(coords.lat, coords.lon);
-
-          if (!cancelled) {
-            setResults(address);
-          }
-
-          return;
+      if (coords) {
+        const apiResults = await reverseGeocode(coords.lat, coords.lon);
+        if (!cancelledRef.current) {
+          setResults(apiResults);
         }
-
-        const filteredPlaces = placesRef.current.filter((place) => {
-          return place.title.toLowerCase().includes(query.toLowerCase());
-        });
-
-        const placeResults: SearchResult[] = filteredPlaces.map((place) => ({
-          lat: place.coords[0],
-          lon: place.coords[1],
-          display_name: place.title,
-        }));
-
-        if (filteredPlaces.length < 3) {
-          const apiResults = await searchPlace(query);
-          if (!cancelled) {
-            setResults([...placeResults, ...apiResults].slice(0, 5));
-          }
-        } else {
-          setResults(placeResults.slice(0, 5));
-        }
+        return;
       }
 
-      await doSearch();
-
-      return () => {
-        cancelled = true;
-      };
+      const apiResults = await searchPlace(query);
+      if (!cancelledRef.current) {
+        setResults(apiResults.slice(0, 5));
+      }
     }, 500);
 
     return () => {
+      cancelledRef.current = true;
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }

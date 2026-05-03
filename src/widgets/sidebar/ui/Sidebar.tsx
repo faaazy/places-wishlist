@@ -73,7 +73,8 @@ function PlaceCard({ place }: { place: Place }) {
 }
 
 export function Sidebar() {
-  const { places, newPlaceCoords, editingPlaceId, flyTo } = usePlaces();
+  const { places, newPlaceCoords, editingPlaceId, flyTo, showSearchPopup } =
+    usePlaces();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [activeFilter, setActiveFilter] = useState<PlaceCategory | "all">(
     "all",
@@ -94,7 +95,6 @@ export function Sidebar() {
 
   useEffect(() => {
     if (newPlaceCoords ?? editingPlaceId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOpen(true);
     }
   }, [newPlaceCoords, editingPlaceId]);
@@ -109,6 +109,8 @@ export function Sidebar() {
 
   const selectResultHandler = (result: SearchResult) => {
     if (result.lat != null && result.lon != null) {
+      showSearchPopup([result.lat, result.lon], result.display_name);
+
       flyTo?.(result.lat, result.lon, 15);
     }
     setShowDropdown(false);
