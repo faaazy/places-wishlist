@@ -49,6 +49,7 @@ export async function reverseGeocode(
   );
 
   const data = await res.json();
+  console.log(data);
 
-  return [{ lat, lon, display_name: data[0].features.display_name }];
+  return [{ lat, lon, display_name: data.features[0].properties.display_name }];
 }
