@@ -1,5 +1,7 @@
 import { PlaceContextProvider } from "@/entities/place/model/PlaceContext";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "./styles/index.css";
 import { MapPage } from "@/pages/map/MapPage";
 import { createBrowserRouter, RouterProvider } from "react-router";

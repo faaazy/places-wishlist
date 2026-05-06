@@ -185,3 +185,27 @@
 .markerIcon.adventure {
   background: #ec4899;
 }
+
+.clusterIconWrapper {
+  background: none !important;
+  border: none !important;
+}
+
+.clusterIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.clusterCount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1d23;
+  line-height: 1;
+}

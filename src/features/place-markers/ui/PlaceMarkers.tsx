@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import L from "leaflet";
 import { Trash2, Pencil, Star } from "lucide-react";
 import styles from "./PlaceMarkers.module.css";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 
 const colorMap: Record<PlaceCategory, string> = {
   nature: "#22c55e",
@@ -32,6 +33,16 @@ function createIcon(category: PlaceCategory) {
   });
 }
 
+function createClusterIcon(cluster: L.MarkerCluster) {
+  const count = cluster.getChildCount();
+  return L.divIcon({
+    html: `<div class="${styles.clusterIcon}"><span class="${styles.clusterCount}">${count}</span></div>`,
+    className: styles.clusterIconWrapper,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+}
+
 export function PlaceMarkers() {
   const { places, removePlace, startEditing } = usePlaces();
   const navigate = useNavigate();
@@ -47,7 +58,12 @@ export function PlaceMarkers() {
   }, [placeId]);
 
   return (
-    <>
+    <MarkerClusterGroup
+      chunkedLoading
+      spiderfyOnMaxZoom
+      showCoverageOnHover
+      iconCreateFunction={createClusterIcon}
+    >
       {places.map((place) => (
         <Marker
           ref={(el) => {
@@ -112,6 +128,6 @@ export function PlaceMarkers() {
           </Popup>
         </Marker>
       ))}
-    </>
+    </MarkerClusterGroup>
   );
 }
