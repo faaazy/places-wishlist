@@ -41,7 +41,9 @@ export function AddPlaceForm() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h3 className={styles.title}>Add new place</h3>
+      <h3 className={styles.title}>
+        {editingPlaceId ? "Edit place" : "Add new place"}
+      </h3>
 
       <div>
         <label className={styles.label} htmlFor="title">

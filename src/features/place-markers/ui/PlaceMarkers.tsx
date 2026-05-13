@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
 import { useNavigate, useSearchParams } from "react-router";
 import L from "leaflet";
+import "leaflet.markercluster";
 import { Trash2, Pencil, Star } from "lucide-react";
 import styles from "./PlaceMarkers.module.css";
 import MarkerClusterGroup from "react-leaflet-markercluster";
@@ -38,13 +39,13 @@ function createClusterIcon(cluster: L.MarkerCluster) {
   return L.divIcon({
     html: `<div class="${styles.clusterIcon}"><span class="${styles.clusterCount}">${count}</span></div>`,
     className: styles.clusterIconWrapper,
-    iconSize: [40, 40],
+    iconSize: [30, 30],
     iconAnchor: [20, 20],
   });
 }
 
 export function PlaceMarkers() {
-  const { places, removePlace, startEditing } = usePlaces();
+  const { places, removePlace, startEditing, updatePlace } = usePlaces();
   const navigate = useNavigate();
 
   const markerRefs = useRef<Record<string, L.Marker>>({});
@@ -105,6 +106,22 @@ export function PlaceMarkers() {
                     }
                     fill={i < place.wishRating ? "currentColor" : "none"}
                   />
+                ))}
+              </div>
+
+              <div className={styles.popupStatus}>
+                {(["wishlist", "visited", "skipped"] as const).map((status) => (
+                  <button
+                    key={status}
+                    className={`${styles.popupStatusBtn} ${place.status === status ? styles.active : ""}`}
+                    onClick={() => updatePlace(place.id, { status })}
+                  >
+                    {status === "wishlist"
+                      ? "Wishlist"
+                      : status === "visited"
+                        ? "Visited"
+                        : "Skipped"}
+                  </button>
                 ))}
               </div>
 
