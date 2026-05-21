@@ -6,19 +6,26 @@ import "./styles/index.css";
 import { MapPage } from "@/pages/map/MapPage";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { Layout } from "@/widgets/layout";
+import { ProfilePage } from "@/pages/profile/ProfilePage";
+import { UserContextProvider } from "@/entities/user/model/UserContext";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <Layout />,
-      children: [{ path: "/", element: <MapPage /> }],
+      children: [
+        { path: "/", element: <MapPage /> },
+        { path: "/profile", element: <ProfilePage /> },
+      ],
     },
   ]);
 
   return (
     <PlaceContextProvider>
-      <RouterProvider router={router} />
+      <UserContextProvider>
+        <RouterProvider router={router} />
+      </UserContextProvider>
     </PlaceContextProvider>
   );
 }

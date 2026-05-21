@@ -50,3 +50,16 @@
   color: #1a1d23;
   border-color: #34d399;
 }
+
+.nav .profileLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profileAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}

@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { UserProfile } from "./types";
 import { getUser, saveUser } from "@/shared/lib/storage";
 
+// its only for 1 user from localStorage for now without db
 interface UserContextValue {
-  // its only for 1 user from localStorage for now without db
   user: UserProfile;
   updateUser: (data: Partial<UserProfile>) => void;
 }
