@@ -19,7 +19,9 @@ export function Header() {
           </li>
           <li>
             <Link to={"/profile"} className={styles.profileLink}>
-              {user.avatar && <img src={user.avatar} className={styles.profileAvatar} />}
+              {user.avatar && (
+                <img src={user.avatar} className={styles.profileAvatar} />
+              )}
               Profile
             </Link>
           </li>
