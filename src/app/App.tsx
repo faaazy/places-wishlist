@@ -8,6 +8,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { Layout } from "@/widgets/layout";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { UserContextProvider } from "@/entities/user/model/UserContext";
+import { AuthContextProvider } from "@/entities/auth/model/AuthContext";
 
 function App() {
   const router = createBrowserRouter([
@@ -22,11 +23,13 @@ function App() {
   ]);
 
   return (
-    <PlaceContextProvider>
-      <UserContextProvider>
-        <RouterProvider router={router} />
-      </UserContextProvider>
-    </PlaceContextProvider>
+    <AuthContextProvider>
+      <PlaceContextProvider>
+        <UserContextProvider>
+          <RouterProvider router={router} />
+        </UserContextProvider>
+      </PlaceContextProvider>
+    </AuthContextProvider>
   );
 }
 
