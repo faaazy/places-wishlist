@@ -24,11 +24,11 @@ function App() {
 
   return (
     <AuthContextProvider>
-      <PlaceContextProvider>
-        <UserContextProvider>
+      <UserContextProvider>
+        <PlaceContextProvider>
           <RouterProvider router={router} />
-        </UserContextProvider>
-      </PlaceContextProvider>
+        </PlaceContextProvider>
+      </UserContextProvider>
     </AuthContextProvider>
   );
 }
