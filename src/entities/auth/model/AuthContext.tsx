@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextValue {
   authUser: User | null;
+  loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -17,16 +18,16 @@ export const AuthContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [authUser, setAuthUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthUser(session?.user ?? null);
-    });
-
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setAuthUser(session?.user ?? null);
+      if (event === "INITIAL_SESSION") {
+        setLoading(false);
+      }
     });
 
     return () => {
@@ -56,7 +57,9 @@ export const AuthContextProvider = ({
   };
 
   return (
-    <AuthContext.Provider value={{ authUser, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{ authUser, loading, signIn, signUp, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

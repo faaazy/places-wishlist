@@ -1,14 +1,15 @@
 @font-face {
-  font-family: 'Inter Variable';
-  src: url('../../assets/fonts/InterVariable.woff2') format('woff2-variations');
+  font-family: "Inter Variable";
+  src: url("../../assets/fonts/InterVariable.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono Variable';
-  src: url('../../assets/fonts/JetBrainsMono[wght].woff2') format('woff2-variations');
+  font-family: "JetBrains Mono Variable";
+  src: url("../../assets/fonts/JetBrainsMono[wght].woff2")
+    format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -25,8 +26,10 @@
   --accent-bg: rgba(52, 211, 153, 0.15);
   --yellow: #f59e0b;
 
-  --sans: 'Inter Variable', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+  --sans: "Inter Variable", system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "Cascadia Code",
+    monospace;
 
   font: 16px/1.5 var(--sans);
   color-scheme: dark;
@@ -47,7 +50,8 @@ button {
   font-family: var(--sans);
 }
 
-input, textarea {
+input,
+textarea {
   font-family: var(--sans);
 }
 
@@ -104,4 +108,26 @@ ul {
 
 .leaflet-container {
   font-family: var(--sans);
+}
+
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  bottom: 3px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

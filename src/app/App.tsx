@@ -9,6 +9,7 @@ import { Layout } from "@/widgets/layout";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { UserContextProvider } from "@/entities/user/model/UserContext";
 import { AuthContextProvider } from "@/entities/auth/model/AuthContext";
+import { AuthGate } from "./ui/AuthGate";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,11 +25,13 @@ function App() {
 
   return (
     <AuthContextProvider>
-      <UserContextProvider>
-        <PlaceContextProvider>
-          <RouterProvider router={router} />
-        </PlaceContextProvider>
-      </UserContextProvider>
+      <AuthGate>
+        <UserContextProvider>
+          <PlaceContextProvider>
+            <RouterProvider router={router} />
+          </PlaceContextProvider>
+        </UserContextProvider>
+      </AuthGate>
     </AuthContextProvider>
   );
 }
