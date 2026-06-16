@@ -85,7 +85,18 @@ export const PlaceContextProvider = ({
   }, [authUser]);
 
   useEffect(() => {
-    loadPlaces();
+    async function init() {
+      if (authUser) {
+        const migrated = localStorage.getItem("migrated_" + authUser.id);
+        if (!migrated) {
+          await migrateLocalPlaces(authUser.id);
+        }
+      }
+
+      loadPlaces();
+    }
+
+    init();
   }, [authUser]);
 
   useEffect(() => {
@@ -140,6 +151,29 @@ export const PlaceContextProvider = ({
           place.id === id ? { ...place, ...updatedPlace } : place,
         ),
       );
+    }
+  };
+
+  const migrateLocalPlaces = async (userId: string) => {
+    const localPlaces = getPlaces();
+    if (localPlaces.length === 0) return;
+
+    const { error } = await supabase.from("places").insert(
+      localPlaces.map((p) => ({
+        id_user: userId,
+        title: p.title,
+        description: p.description,
+        lat: p.coords[0],
+        lng: p.coords[1],
+        category: p.category,
+        wish_rating: p.wishRating,
+        status: p.status,
+      })),
+    );
+
+    if (!error) {
+      localStorage.removeItem("places");
+      localStorage.setItem("migrated_" + userId, "true");
     }
   };
 
