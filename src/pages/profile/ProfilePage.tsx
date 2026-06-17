@@ -6,7 +6,7 @@ import type { UserProfile } from "@/entities/user/model/types";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 
 export function ProfilePage() {
-  const { user, updateUser } = useUser();
+  const { user, updateUserProfile } = useUser();
   const { places } = usePlaces();
 
   const [newUser, setNewUser] = useState<UserProfile>(user);
@@ -104,7 +104,7 @@ export function ProfilePage() {
             <button
               className={styles.btnPrimary}
               type="button"
-              onClick={() => updateUser(newUser)}
+              onClick={() => updateUserProfile(newUser)}
             >
               <Save size={15} />
               Save

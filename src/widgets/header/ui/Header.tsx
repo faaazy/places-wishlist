@@ -1,10 +1,18 @@
-import { MapPinned } from "lucide-react";
-import { Link } from "react-router";
+import { LogIn, LogOut, MapPinned } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import styles from "./Header.module.css";
 import { useUser } from "@/entities/user/model/UserContext";
+import { useAuth } from "@/entities/auth/model/AuthContext";
 
 export function Header() {
   const { user } = useUser();
+  const { authUser, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const signOutHandler = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className={styles.header}>
@@ -24,6 +32,23 @@ export function Header() {
               )}
               Profile
             </Link>
+          </li>
+          <li>
+            {authUser ? (
+              <button
+                type="button"
+                className={styles.signOutBtn}
+                onClick={signOutHandler}
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            ) : (
+              <Link to={"/auth"} className={styles.signInBtn}>
+                <LogIn size={16} />
+                Sign in
+              </Link>
+            )}
           </li>
         </ul>
       </nav>

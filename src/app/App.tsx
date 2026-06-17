@@ -10,6 +10,7 @@ import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { UserContextProvider } from "@/entities/user/model/UserContext";
 import { AuthContextProvider } from "@/entities/auth/model/AuthContext";
 import { AuthGate } from "./ui/AuthGate";
+import { AuthPage } from "@/pages";
 
 function App() {
   const router = createBrowserRouter([
@@ -19,6 +20,7 @@ function App() {
       children: [
         { path: "/", element: <MapPage /> },
         { path: "/profile", element: <ProfilePage /> },
+        { path: "/auth", element: <AuthPage /> },
       ],
     },
   ]);
