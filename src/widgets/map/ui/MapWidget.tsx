@@ -105,8 +105,56 @@ function FlyToCallbackSetter() {
   return null;
 }
 
+function SearchPopupHandler() {
+  const map = useMap();
+  const { searchPopup, confirmSearchAdd, clearSearchPopup } = usePlaces();
+  const confirmRef = useRef(confirmSearchAdd);
+  confirmRef.current = confirmSearchAdd;
+
+  useEffect(() => {
+    if (!searchPopup) return;
+
+    const container = document.createElement("div");
+    container.className = styles.clickPopup;
+    container.style.cssText = "text-align: center;";
+
+    const title = document.createElement("p");
+    title.style.cssText =
+      "font-size: 14px; font-weight: 600; margin: 0 0 12px 0; color: var(--text-h);";
+    title.textContent = searchPopup.title;
+
+    const btn = document.createElement("button");
+    btn.className = styles.clickPopupBtn;
+    btn.textContent = "Add to wishlist";
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      confirmRef.current();
+    };
+
+    container.appendChild(title);
+    container.appendChild(btn);
+
+    const popup = L.popup()
+      .setLatLng(searchPopup.coords)
+      .setContent(container)
+      .openOn(map);
+
+    const onPopupClose = () => {
+      clearSearchPopup();
+    };
+    map.on("popupclose", onPopupClose);
+
+    return () => {
+      map.off("popupclose", onPopupClose);
+      map.closePopup(popup);
+    };
+  }, [searchPopup, map, clearSearchPopup]);
+
+  return null;
+}
+
 export const MapWidget = () => {
-  const { startAdding, searchPopup, confirmSearchAdd } = usePlaces();
+  const { startAdding, searchPopup } = usePlaces();
   const [clickCoords, setClickCoords] = useState<[number, number] | null>(null);
 
   return (
@@ -134,22 +182,7 @@ export const MapWidget = () => {
 
         <FlyToCallbackSetter />
 
-        {searchPopup && (
-          <Popup position={searchPopup.coords}>
-            <div className={styles.clickPopup}>
-              <p className={styles.clickPopupTitle}>{searchPopup.title}</p>
-              <button
-                className={styles.clickPopupBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  confirmSearchAdd();
-                }}
-              >
-                Add to wishlist
-              </button>
-            </div>
-          </Popup>
-        )}
+        <SearchPopupHandler />
 
         {clickCoords && !searchPopup && (
           <Popup position={clickCoords}>

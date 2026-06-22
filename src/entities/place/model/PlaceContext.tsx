@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import type { Place } from "./types";
-import { getPlaces, savePlaces } from "@/shared/lib/storage";
+import { getPlaces } from "@/shared/lib/storage";
 import { useAuth } from "@/entities/auth/model/AuthContext";
 import { supabase } from "@/shared/lib/supabase";
 
@@ -32,6 +32,7 @@ interface PlaceContextValue {
   } | null;
   showSearchPopup: (coords: [number, number], title: string) => void;
   confirmSearchAdd: () => void;
+  clearSearchPopup: () => void;
 }
 
 const PlaceContext = createContext<PlaceContextValue | null>(null);
@@ -225,6 +226,8 @@ export const PlaceContextProvider = ({
     setSearchPopup(null);
   };
 
+  const clearSearchPopup = () => setSearchPopup(null);
+
   return (
     <PlaceContext.Provider
       value={{
@@ -243,6 +246,7 @@ export const PlaceContextProvider = ({
         showSearchPopup,
         searchPopup,
         confirmSearchAdd,
+        clearSearchPopup,
       }}
     >
       {children}
