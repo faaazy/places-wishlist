@@ -41,7 +41,7 @@ export const PlaceContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [places, setPlaces] = useState<Place[]>(() => getPlaces());
+  const [places, setPlaces] = useState<Place[]>([]);
   const [newPlaceCoords, setNewPlaceCoords] = useState<[number, number] | null>(
     null,
   );
@@ -99,10 +99,6 @@ export const PlaceContextProvider = ({
     init();
   }, [authUser]);
 
-  useEffect(() => {
-    if (!isAuthenticated) savePlaces(places);
-  }, [places, isAuthenticated]);
-
   const addPlace = async (place: Place) => {
     if (isAuthenticated) {
       await supabase.from("places").insert({
@@ -157,6 +153,18 @@ export const PlaceContextProvider = ({
   const migrateLocalPlaces = async (userId: string) => {
     const localPlaces = getPlaces();
     if (localPlaces.length === 0) return;
+
+    const { data: existing } = await supabase
+      .from("places")
+      .select("id")
+      .eq("id_user", userId)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      localStorage.setItem("migrated_" + userId, "true");
+      localStorage.removeItem("places");
+      return;
+    }
 
     const { error } = await supabase.from("places").insert(
       localPlaces.map((p) => ({

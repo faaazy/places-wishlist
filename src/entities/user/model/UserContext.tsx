@@ -24,9 +24,7 @@ export const UserContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [user, setUser] = useState<UserProfile>(() => {
-    return getUser() ?? guestMockData;
-  });
+  const [user, setUser] = useState<UserProfile>(guestMockData);
 
   const { authUser } = useAuth();
 
@@ -47,7 +45,7 @@ export const UserContextProvider = ({
 
   useEffect(() => {
     if (authUser === null) {
-      setUser(guestMockData);
+      setUser(getUser() ?? guestMockData);
     } else {
       loadUserProfile(authUser.id).catch(() => {
         supabase

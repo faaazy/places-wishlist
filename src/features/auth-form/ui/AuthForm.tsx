@@ -30,7 +30,7 @@ export function AuthForm() {
       <p className={styles.switchText}>
         {isSignIn ? (
           <>
-            Don't have an account?{" "}
+            Don't have an account?
             <button
               className={styles.switchLink}
               type="button"
@@ -41,7 +41,7 @@ export function AuthForm() {
           </>
         ) : (
           <>
-            Already have an account?{" "}
+            Already have an account?
             <button
               className={styles.switchLink}
               type="button"

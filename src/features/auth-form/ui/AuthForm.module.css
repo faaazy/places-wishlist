@@ -59,6 +59,7 @@
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
+  margin-left: 3px;
 }
 
 .switchLink:hover {

@@ -1,8 +1,21 @@
+import { useState } from "react";
+import { useAuthForm } from "../model/useAuthForm";
 import styles from "./SignUpForm.module.css";
 
 export function SignUpForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { authFormSignUp, error, isSubmitting } = useAuthForm();
+
+  const submitHandler = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    authFormSignUp({ name, email, password });
+  };
+
   return (
-    <form className={styles.form}>
+    <form className={styles.form} onSubmit={submitHandler}>
       <div>
         <label className={styles.label} htmlFor="signup-name">
           Name
@@ -13,6 +26,8 @@ export function SignUpForm() {
           id="signup-name"
           placeholder="Your name"
           autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
       </div>
 
@@ -25,6 +40,8 @@ export function SignUpForm() {
           type="email"
           id="signup-email"
           placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
@@ -37,15 +54,19 @@ export function SignUpForm() {
           type="password"
           id="signup-password"
           placeholder="Create a password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </div>
 
-      <div className={styles.error}>
-        Registration failed. Please check your input and try again.
-      </div>
+      {error && <div className={styles.error}>{error}</div>}
 
-      <button className={styles.submitBtn} type="submit">
-        Sign Up
+      <button
+        className={styles.submitBtn}
+        disabled={isSubmitting}
+        type="submit"
+      >
+        {isSubmitting ? "..." : "Sign Up"}
       </button>
     </form>
   );
