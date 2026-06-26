@@ -1,8 +1,8 @@
 export interface UserProfile {
   id: string;
   name: string;
-  avatar: string;
+  avatar_url: string;
   bio: string;
-  createdAt: string;
+  created_at: string;
   // probably something else
 }

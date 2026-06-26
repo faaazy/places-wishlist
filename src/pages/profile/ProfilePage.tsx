@@ -1,9 +1,24 @@
 import { Camera, RotateCcw, Save, MapPinned } from "lucide-react";
 import styles from "./ProfilePage.module.css";
 import { useUser } from "@/entities/user/model/UserContext";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { UserProfile } from "@/entities/user/model/types";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
+
+function resizeImage(file: File, maxW: number, maxH: number): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = maxW;
+      canvas.height = maxH;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, maxW, maxH);
+      canvas.toBlob((blob) => resolve(blob!), "image/jpeg", 0.7);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
 
 export function ProfilePage() {
   const { user, updateUserProfile } = useUser();
@@ -12,15 +27,17 @@ export function ProfilePage() {
   const [newUser, setNewUser] = useState<UserProfile>(user);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  function fileHandler(e: React.ChangeEvent<HTMLInputElement>) {
+  async function fileHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const resized = await resizeImage(file, 200, 200);
+
     const reader = new FileReader();
     reader.onload = () => {
-      setNewUser((prev) => ({ ...prev, avatar: reader.result as string }));
+      setNewUser((prev) => ({ ...prev, avatar_url: reader.result as string }));
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(resized);
   }
 
   const total = places.length;
@@ -28,14 +45,18 @@ export function ProfilePage() {
   const visited = places.filter((p) => p.status === "visited").length;
   const skipped = places.filter((p) => p.status === "skipped").length;
 
+  useEffect(() => {
+    setNewUser(user);
+  }, [user]);
+
   return (
     <div className={styles.page}>
       <div className={styles.content}>
         <div className={styles.header}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>
-              {newUser.avatar ? (
-                <img src={newUser.avatar} className={styles.avatarImg} />
+              {newUser.avatar_url ? (
+                <img src={newUser.avatar_url} className={styles.avatarImg} />
               ) : (
                 <span className={styles.initials}>
                   {user.name.slice(0, 1).toUpperCase()}

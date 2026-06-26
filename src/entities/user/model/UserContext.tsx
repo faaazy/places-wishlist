@@ -14,9 +14,9 @@ const UserContext = createContext<UserContextValue | null>(null);
 const guestMockData = {
   id: crypto.randomUUID(),
   name: "User",
-  avatar: "",
+  avatar_url: "",
   bio: "",
-  createdAt: new Date().toISOString(),
+  created_at: new Date().toISOString(),
 };
 
 export const UserContextProvider = ({
@@ -38,6 +38,7 @@ export const UserContextProvider = ({
     if (error) {
       throw error;
     } else {
+      localStorage.setItem("cached_user_profile", JSON.stringify(data));
       setUser(data);
       return data;
     }
@@ -47,22 +48,40 @@ export const UserContextProvider = ({
     if (authUser === null) {
       setUser(getUser() ?? guestMockData);
     } else {
-      loadUserProfile(authUser.id).catch(() => {
-        supabase
-          .from("users")
-          .insert({ id: authUser.id, name: "User" })
-          .then(() => setUser({ ...guestMockData, id: authUser.id }));
+      loadUserProfile(authUser.id).catch((err) => {
+        if (err?.code === "PGRST116") {
+          supabase
+            .from("users")
+            .insert({ id: authUser.id, name: "User" })
+            .then(({ error }) => {
+              if (!error) setUser({ ...guestMockData, id: authUser.id });
+            });
+        } else {
+          const cached = localStorage.getItem("cached_user_profile");
+          if (cached) {
+            setUser(JSON.parse(cached));
+          } else {
+            console.error("loadUserProfile error:", err);
+          }
+        }
       });
     }
   }, [authUser]);
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
-    setUser((prev) => ({ ...prev, ...data }));
+    const { name, bio, avatar_url } = data;
+    const updatedData = { name, bio, avatar_url };
+
+    setUser((prev) => {
+      const next = { ...prev, ...data };
+      localStorage.setItem("cached_user_profile", JSON.stringify(next));
+      return next;
+    });
 
     if (authUser !== null) {
       const { error } = await supabase
         .from("users")
-        .update(data)
+        .update(updatedData)
         .eq("id", authUser.id);
 
       if (error) throw error;
