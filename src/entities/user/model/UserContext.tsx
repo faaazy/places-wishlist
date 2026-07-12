@@ -49,21 +49,10 @@ export const UserContextProvider = ({
       setUser(getUser() ?? guestMockData);
     } else {
       loadUserProfile(authUser.id).catch((err) => {
-        if (err?.code === "PGRST116") {
-          supabase
-            .from("users")
-            .insert({ id: authUser.id, name: "User" })
-            .then(({ error }) => {
-              if (!error) setUser({ ...guestMockData, id: authUser.id });
-            });
-        } else {
-          const cached = localStorage.getItem("cached_user_profile");
-          if (cached) {
-            setUser(JSON.parse(cached));
-          } else {
-            console.error("loadUserProfile error:", err);
-          }
-        }
+        console.error("loadUserProfile errors:", err);
+
+        const cached = localStorage.getItem("cached_user_profile");
+        if (cached) setUser(JSON.parse(cached));
       });
     }
   }, [authUser]);

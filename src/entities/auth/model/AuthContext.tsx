@@ -1,3 +1,4 @@
+import { createUserProfile } from "@/entities/user/model/createUserProfile";
 import { supabase } from "@/shared/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -45,13 +46,17 @@ export const AuthContextProvider = ({
   };
 
   const signUp = async (name: string, email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name } },
     });
 
     if (error) throw error;
+
+    if (data.user) {
+      await createUserProfile(data.user.id, name);
+    }
   };
 
   const signOut = async () => {
