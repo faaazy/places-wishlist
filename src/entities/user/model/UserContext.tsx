@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { UserProfile } from "./types";
-import { getUser, saveUser } from "@/shared/lib/storage";
+import { getUser } from "@/shared/lib/storage";
 import { supabase } from "@/shared/lib/supabase";
 import { useAuth } from "@/entities/auth/model/AuthContext";
 
@@ -58,6 +58,12 @@ export const UserContextProvider = ({
   }, [authUser]);
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
+    if (authUser === null) {
+      throw new Error(
+        "You must be signed in to edit your profile"
+      );
+    }
+
     const { name, bio, avatar_url } = data;
     const updatedData = { name, bio, avatar_url };
 
@@ -67,19 +73,12 @@ export const UserContextProvider = ({
       return next;
     });
 
-    if (authUser !== null) {
-      const { error } = await supabase
-        .from("users")
-        .update(updatedData)
-        .eq("id", authUser.id);
+    const { error } = await supabase
+      .from("users")
+      .update(updatedData)
+      .eq("id", authUser.id);
 
-      if (error) throw error;
-    } else {
-      setUser((prev) => {
-        saveUser({ ...prev, ...data });
-        return { ...prev, ...data };
-      });
-    }
+    if (error) throw error;
   };
 
   return (

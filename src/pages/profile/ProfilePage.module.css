@@ -104,6 +104,31 @@
   margin: 0 0 16px;
 }
 
+/* ---- Edit locked (guest) ---- */
+
+.editLocked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editLocked .btnPrimary {
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.lockText {
+  min-width: 0;
+}
+
+.lockMessage {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
 /* ---- Form ---- */
 
 .field {

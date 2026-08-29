@@ -1,9 +1,11 @@
-import { Camera, RotateCcw, Save, MapPinned } from "lucide-react";
+import { Camera, LogIn, RotateCcw, Save, MapPinned } from "lucide-react";
 import styles from "./ProfilePage.module.css";
 import { useUser } from "@/entities/user/model/UserContext";
 import { useEffect, useRef, useState } from "react";
 import type { UserProfile } from "@/entities/user/model/types";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
+import { useAuth } from "@/entities/auth/model/AuthContext";
+import { Link } from "react-router";
 
 function resizeImage(file: File, maxW: number, maxH: number): Promise<Blob> {
   return new Promise((resolve) => {
@@ -23,6 +25,9 @@ function resizeImage(file: File, maxW: number, maxH: number): Promise<Blob> {
 export function ProfilePage() {
   const { user, updateUserProfile } = useUser();
   const { places } = usePlaces();
+  const { authUser } = useAuth();
+
+  const isGuest = authUser === null;
 
   const [newUser, setNewUser] = useState<UserProfile>(user);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -70,13 +75,15 @@ export function ProfilePage() {
               ref={fileRef}
               onChange={fileHandler}
             />
-            <button
-              onClick={() => fileRef.current?.click()}
-              className={styles.avatarBtn}
-              type="button"
-            >
-              <Camera size={14} />
-            </button>
+            {!isGuest && (
+              <button
+                onClick={() => fileRef.current?.click()}
+                className={styles.avatarBtn}
+                type="button"
+              >
+                <Camera size={14} />
+              </button>
+            )}
           </div>
           <div className={styles.headerInfo}>
             <h1 className={styles.name}>{user.name || "User"}</h1>
@@ -85,6 +92,22 @@ export function ProfilePage() {
         </div>
 
         <div className={styles.card}>
+          {isGuest ? (
+            <div className={styles.editLocked}>
+              <div className={styles.lockText}>
+                <h2 className={styles.sectionTitle}>Edit profile</h2>
+                <p className={styles.lockMessage}>
+                  Sign in to be able to edit your profile and save your places
+                  to the cloud.
+                </p>
+              </div>
+              <Link to={"/auth"} className={styles.btnPrimary}>
+                <LogIn size={15} />
+                Sign in
+              </Link>
+            </div>
+          ) : (
+          <>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="name">
               Name
@@ -139,6 +162,8 @@ export function ProfilePage() {
               Reset
             </button>
           </div>
+          </>
+          )}
         </div>
 
         <div className={styles.card}>

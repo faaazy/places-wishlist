@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import type { Place } from "./types";
-import { getPlaces } from "@/shared/lib/storage";
+import { getPlaces, savePlaces } from "@/shared/lib/storage";
 import { useAuth } from "@/entities/auth/model/AuthContext";
 import { supabase } from "@/shared/lib/supabase";
 
@@ -15,6 +15,10 @@ interface PlaceContextValue {
   places: Place[];
   addPlace: (place: Place) => Promise<void>;
   removePlace: (id: string) => Promise<void>;
+  restorePlace: (place: Place) => Promise<void>;
+  removedPlace: Place | null;
+  clearRemovedPlace: () => void;
+  undoRemove: () => Promise<void>;
   newPlaceCoords: [number, number] | null;
   startAdding: (coords: [number, number]) => void;
   cancelAdding: () => void;
@@ -55,9 +59,13 @@ export const PlaceContextProvider = ({
     coords: [number, number];
     title: string;
   } | null>(null);
+  const [removedPlace, setRemovedPlace] = useState<Place | null>(null);
+  const removedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { authUser } = useAuth();
   const isAuthenticated = authUser !== null;
+  const wasAuthenticatedRef = useRef(isAuthenticated);
+  const lastCloudPlacesRef = useRef<Place[]>([]);
 
   const loadPlaces = useCallback(async () => {
     if (isAuthenticated) {
@@ -68,18 +76,18 @@ export const PlaceContextProvider = ({
         .order("created_at", { ascending: false });
 
       if (error) return;
-      setPlaces(
-        data.map((row) => ({
-          id: row.id,
-          title: row.title,
-          description: row.description,
-          coords: [row.lat, row.lng] as [number, number],
-          category: row.category,
-          wishRating: row.wish_rating,
-          status: row.status,
-          createdAt: row.created_at,
-        })),
-      );
+      const loaded = data.map((row) => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        coords: [row.lat, row.lng] as [number, number],
+        category: row.category,
+        wishRating: row.wish_rating,
+        status: row.status,
+        createdAt: row.created_at,
+      }));
+      lastCloudPlacesRef.current = loaded;
+      setPlaces(loaded);
     } else {
       setPlaces(getPlaces());
     }
@@ -88,12 +96,22 @@ export const PlaceContextProvider = ({
   useEffect(() => {
     async function init() {
       if (authUser) {
+        const localPlaces = getPlaces();
         const migrated = localStorage.getItem("migrated_" + authUser.id);
-        if (!migrated) {
+
+        if (migrated && localPlaces.length > 0) {
           await migrateLocalPlaces(authUser.id);
+          localStorage.removeItem("migrated_" + authUser.id);
+        } else if (!migrated) {
+          await migrateLocalPlaces(authUser.id);
+        }
+      } else {
+        if (wasAuthenticatedRef.current && lastCloudPlacesRef.current.length > 0) {
+          savePlaces(lastCloudPlacesRef.current);
         }
       }
 
+      wasAuthenticatedRef.current = isAuthenticated;
       loadPlaces();
     }
 
@@ -120,11 +138,60 @@ export const PlaceContextProvider = ({
   };
 
   const removePlace = async (id: string) => {
+    let removed: Place | null = null;
     if (isAuthenticated) {
+      removed = places.find((p) => p.id === id) ?? null;
       await supabase.from("places").delete().eq("id", id);
       await loadPlaces();
     } else {
-      setPlaces((prev) => prev.filter((place) => place.id !== id));
+      removed = places.find((p) => p.id === id) ?? null;
+      setPlaces((prev) => {
+        const next = prev.filter((place) => place.id !== id);
+        savePlaces(next);
+        return next;
+      });
+    }
+
+    if (removed) {
+      setRemovedPlace(removed);
+      if (removedTimeoutRef.current) clearTimeout(removedTimeoutRef.current);
+      removedTimeoutRef.current = setTimeout(() => {
+        setRemovedPlace(null);
+      }, 6000);
+    }
+  };
+
+  const clearRemovedPlace = () => {
+    if (removedTimeoutRef.current) clearTimeout(removedTimeoutRef.current);
+    setRemovedPlace(null);
+  };
+
+  const undoRemove = async () => {
+    if (!removedPlace) return;
+    await restorePlace(removedPlace);
+    clearRemovedPlace();
+  };
+
+  const restorePlace = async (place: Place) => {
+    if (isAuthenticated) {
+      await supabase.from("places").insert({
+        id_user: authUser.id,
+        id: place.id,
+        title: place.title,
+        description: place.description,
+        lat: place.coords[0],
+        lng: place.coords[1],
+        category: place.category,
+        wish_rating: place.wishRating,
+        status: place.status,
+      });
+      await loadPlaces();
+    } else {
+      setPlaces((prev) => {
+        const next = [place, ...prev];
+        savePlaces(next);
+        return next;
+      });
     }
   };
 
@@ -157,13 +224,34 @@ export const PlaceContextProvider = ({
 
     const { data: existing } = await supabase
       .from("places")
-      .select("id")
-      .eq("id_user", userId)
-      .limit(1);
+      .select("id, title, lat, lng")
+      .eq("id_user", userId);
 
     if (existing && existing.length > 0) {
-      localStorage.setItem("migrated_" + userId, "true");
+      const existingKeys = new Set(
+        existing.map((row) => `${row.title}|${row.lat}|${row.lng}`),
+      );
+      const toInsert = localPlaces.filter(
+        (p) => !existingKeys.has(`${p.title}|${p.coords[0]}|${p.coords[1]}`),
+      );
+
+      if (toInsert.length > 0) {
+        await supabase.from("places").insert(
+          toInsert.map((p) => ({
+            id_user: userId,
+            title: p.title,
+            description: p.description,
+            lat: p.coords[0],
+            lng: p.coords[1],
+            category: p.category,
+            wish_rating: p.wishRating,
+            status: p.status,
+          })),
+        );
+      }
+
       localStorage.removeItem("places");
+      localStorage.setItem("migrated_" + userId, "true");
       return;
     }
 
@@ -237,6 +325,10 @@ export const PlaceContextProvider = ({
         startAdding,
         cancelAdding,
         removePlace,
+        restorePlace,
+        removedPlace,
+        clearRemovedPlace,
+        undoRemove,
         updatePlace,
         cancelEditing,
         startEditing,

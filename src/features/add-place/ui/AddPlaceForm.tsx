@@ -1,7 +1,11 @@
 import { useState, type SubmitEventHandler } from "react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
-import { Star } from "lucide-react";
-import type { PlaceCategory, WishRating } from "@/entities/place/model/types";
+import { Star, AlertTriangle } from "lucide-react";
+import type {
+  Place,
+  PlaceCategory,
+  WishRating,
+} from "@/entities/place/model/types";
 import styles from "./AddPlaceForm.module.css";
 import { useAddPlace } from "../model/useAddPlace";
 
@@ -14,7 +18,13 @@ const categories: { value: PlaceCategory; label: string }[] = [
 ];
 
 export function AddPlaceForm() {
-  const { cancelAdding, editingPlaceId, places, cancelEditing } = usePlaces();
+  const {
+    cancelAdding,
+    editingPlaceId,
+    places,
+    cancelEditing,
+    newPlaceCoords,
+  } = usePlaces();
 
   const editingPlace = editingPlaceId
     ? places.find((place) => place.id == editingPlaceId)
@@ -30,11 +40,45 @@ export function AddPlaceForm() {
   const [wishRating, setWishRating] = useState<WishRating>(
     editingPlace?.wishRating ?? 3,
   );
+  const [duplicatePlace, setDuplicatePlace] = useState<Place | null>(null);
 
   const { submitPlace } = useAddPlace();
 
+  const isEditing = editingPlaceId !== null;
+
+  const findDuplicate = () => {
+    if (isEditing) return null;
+
+    const coords = newPlaceCoords;
+    if (!coords) return null;
+
+    return (
+      places.find((place) => {
+        const sameTitle =
+          place.title.trim().toLowerCase() === title.trim().toLowerCase();
+        if (!sameTitle) return false;
+
+        if (coords) {
+          const distLat = Math.abs(place.coords[0] - coords[0]);
+          const distLng = Math.abs(place.coords[1] - coords[1]);
+          return distLat < 0.005 && distLng < 0.005;
+        }
+
+        return false;
+      }) ?? null
+    );
+  };
+
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+
+    if (!isEditing) {
+      const dup = findDuplicate();
+      if (dup) {
+        setDuplicatePlace(dup);
+        return;
+      }
+    }
 
     submitPlace({ title, description, category, wishRating });
   };
@@ -107,12 +151,13 @@ export function AddPlaceForm() {
 
       <div className={styles.actions}>
         <button type="submit" className={styles.submitBtn}>
-          {editingPlaceId !== null ? "Confirm" : "Add to wishlist"}
+          {isEditing ? "Confirm" : "Add to wishlist"}
         </button>
         <button
           type="button"
           className={styles.cancelBtn}
           onClick={() => {
+            setDuplicatePlace(null);
             cancelAdding();
             cancelEditing();
           }}
@@ -120,6 +165,35 @@ export function AddPlaceForm() {
           Cancel
         </button>
       </div>
+
+      {duplicatePlace && (
+        <div className={styles.duplicateWarning} role="alert">
+          <div className={styles.duplicateHeader}>
+            <AlertTriangle size={16} />
+            <span>Looks like you already have this place</span>
+          </div>
+          <p className={styles.duplicateTitle}>{duplicatePlace.title}</p>
+          <div className={styles.duplicateActions}>
+            <button
+              type="button"
+              className={styles.duplicateConfirmBtn}
+              onClick={() => {
+                setDuplicatePlace(null);
+                submitPlace({ title, description, category, wishRating });
+              }}
+            >
+              Add anyway
+            </button>
+            <button
+              type="button"
+              className={styles.cancelBtn}
+              onClick={() => setDuplicatePlace(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
