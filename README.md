@@ -87,16 +87,3 @@ src/
 supabase/
   sharing.sql   full DB schema, RLS, RPC, trigger
 ```
-
-## Scripts
-
-| Command            | What it does                        |
-| ------------------ | ----------------------------------- |
-| `npm run dev`      | dev server with HMR                 |
-| `npm run build`    | production build into `dist`        |
-| `npm run lint`     | eslint across the project           |
-| `npm run preview`  | preview the built `dist` locally    |
-
-## Deployment
-
-It is a static app: `npm run build` produces a `dist` folder that drops onto Vercel, Netlify or Cloudflare Pages. Point the host's environment variables to the same two Supabase keys.
