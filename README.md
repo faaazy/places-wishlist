@@ -30,26 +30,26 @@ It works without an account: guest data lives in localStorage. Sign in and every
 
 ## Place categories
 
-| Category  | What it covers                     |
-| --------- | ---------------------------------- |
-| nature    | mountains, parks, landscapes       |
-| city      | streets, viewpoints, urban areas   |
-| food      | cafes, restaurants, local eats     |
-| culture   | museums, architecture, events      |
-| adventure | outdoor activities, thrill rides   |
+| Category  | What it covers                   |
+| --------- | -------------------------------- |
+| nature    | mountains, parks, landscapes     |
+| city      | streets, viewpoints, urban areas |
+| food      | cafes, restaurants, local eats   |
+| culture   | museums, architecture, events    |
+| adventure | outdoor activities, thrill rides |
 
 ## Tech stack
 
-| Layer       | Technology                                           |
-| ----------- | ---------------------------------------------------- |
-| Frontend    | React 19, TypeScript, Vite                           |
-| Routing     | React Router v7                                      |
-| Map         | Leaflet, react-leaflet, markercluster                |
-| Auth + DB   | Supabase (Auth, Postgres, RLS)                       |
-| Place search| Nominatim (OpenStreetMap)                            |
-| Icons       | lucide-react                                         |
-| Styling     | CSS Modules                                          |
-| Fonts       | Inter Variable, JetBrains Mono Variable              |
+| Layer        | Technology                              |
+| ------------ | --------------------------------------- |
+| Frontend     | React 19, TypeScript, Vite              |
+| Routing      | React Router v7                         |
+| Map          | Leaflet, react-leaflet, markercluster   |
+| Auth + DB    | Supabase (Auth, Postgres, RLS)          |
+| Place search | Nominatim (OpenStreetMap)               |
+| Icons        | lucide-react                            |
+| Styling      | CSS Modules                             |
+| Fonts        | Inter Variable, JetBrains Mono Variable |
 
 ## Run your own instance
 
