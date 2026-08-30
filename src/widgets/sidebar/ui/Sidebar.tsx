@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./Sidebar.module.css";
 import {
+  ChevronDown,
+  ChevronRight,
   CircleChevronLeft,
   CircleChevronRight,
   Search,
-  // Map,
-  // List,
-  // User,
   Star,
 } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import type { Place, PlaceCategory } from "@/entities/place/model/types";
+import { useGroups, type SharedPlaceView } from "@/entities/group";
 import { AddPlaceForm } from "@/features/add-place/ui/AddPlaceForm";
 import { useNavigate } from "react-router";
 import { usePlaceSearch } from "@/shared/lib/usePlaceSearch";
@@ -75,6 +75,37 @@ function PlaceCard({ place }: { place: Place }) {
   );
 }
 
+function SharedCard({ view }: { view: SharedPlaceView }) {
+  const navigate = useNavigate();
+
+  return (
+    <div
+      className={styles["sidebar-card"]}
+      onClick={() => navigate("?placeId=" + view.place.id)}
+    >
+      <div className={styles["place-info"]}>
+        <div className={styles["place-name"]}>{view.place.title}</div>
+        <div className={styles["place-location"]}>{view.ownerName}</div>
+        <div className={styles["place-rating"]}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              size={14}
+              className={
+                i < view.place.wishRating
+                  ? styles["star-filled"]
+                  : styles["star-empty"]
+              }
+              fill={i < view.place.wishRating ? "currentColor" : "none"}
+            />
+          ))}
+        </div>
+      </div>
+      <div className={`${styles["place-status"]} ${styles.shared}`}>Shared</div>
+    </div>
+  );
+}
+
 function PopularCard({
   place,
   onSelect,
@@ -88,7 +119,9 @@ function PopularCard({
         <div className={styles["popular-card-title"]}>{place.title}</div>
         <div className={styles["popular-card-desc"]}>{place.description}</div>
       </div>
-      <div className={`${styles["popular-card-category"]} ${styles[place.category]}`}>
+      <div
+        className={`${styles["popular-card-category"]} ${styles[place.category]}`}
+      >
         {place.category}
       </div>
     </div>
@@ -98,7 +131,12 @@ function PopularCard({
 export function Sidebar() {
   const { places, newPlaceCoords, editingPlaceId, flyTo, showSearchPopup } =
     usePlaces();
+  const { sharedPlaces } = useGroups();
   const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [myPlacesOpen, setMyPlacesOpen] = useState<boolean>(true);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [activeFilter, setActiveFilter] = useState<PlaceCategory | "all">(
     "all",
   );
@@ -123,8 +161,49 @@ export function Sidebar() {
       if (sortBy === "rating") {
         return (a.wishRating - b.wishRating) * modifier;
       }
-      return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * modifier;
+      return (
+        (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) *
+        modifier
+      );
     });
+
+  const filteredShared = sharedPlaces
+    .filter((view) => {
+      const matchesFilter =
+        activeFilter === "all" || view.place.category === activeFilter;
+      const matchesSearch = view.place.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesFilter && matchesSearch;
+    })
+    .sort((a, b) => {
+      const modifier = sortOrder === "asc" ? 1 : -1;
+      if (sortBy === "rating") {
+        return (a.place.wishRating - b.place.wishRating) * modifier;
+      }
+      return (
+        (new Date(a.place.createdAt).getTime() -
+          new Date(b.place.createdAt).getTime()) *
+        modifier
+      );
+    });
+
+  const groupedShared = useMemo(() => {
+    const byGroup = new Map<string, SharedPlaceView[]>();
+    for (const view of filteredShared) {
+      const arr = byGroup.get(view.groupId);
+      if (arr) {
+        arr.push(view);
+      } else {
+        byGroup.set(view.groupId, [view]);
+      }
+    }
+    return Array.from(byGroup.entries()).map(([groupId, views]) => ({
+      groupId,
+      groupName: views[0].groupName,
+      views,
+    }));
+  }, [filteredShared]);
 
   useEffect(() => {
     if (newPlaceCoords ?? editingPlaceId) {
@@ -159,16 +238,47 @@ export function Sidebar() {
     flyTo?.(pp.coords[0], pp.coords[1], 15);
   };
 
+  const toggleGroup = (groupId: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  };
+
   return (
     <div
       className={`${styles.sidebar} ${isOpen ? styles.sidebarOpened : styles.sidebarClosed}`}
     >
-      {/* ---- Undo toast ---- */}
       <UndoToast />
-      {/* ---- Top bar ---- */}
       <div className={styles["sidebar-heading"]}>
         <div className={styles["sidebar-heading-top"]}>
-          <span className={styles["sidebar-title"]}>My places</span>
+          {newPlaceCoords === null && (
+            <div className={styles["sidebar-search"]}>
+              <div className={styles["sidebar-search-wrapper"]}>
+                <span className={styles["sidebar-search-icon"]}>
+                  <Search />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search or add a place..."
+                  value={searchQuery}
+                  onChange={(e) => searchChangeHandler(e.target.value)}
+                />
+                {showDropdown && results.length > 0 && (
+                  <SearchDropdown
+                    results={results}
+                    onSelect={selectResultHandler}
+                    onClose={closeDropdownHandler}
+                  />
+                )}
+              </div>
+            </div>
+          )}
           <button
             className={styles["toggle-btn"]}
             onClick={() => setIsOpen(!isOpen)}
@@ -176,31 +286,8 @@ export function Sidebar() {
             {isOpen ? <CircleChevronLeft /> : <CircleChevronRight />}
           </button>
         </div>
-        {newPlaceCoords === null && (
-          <div className={styles["sidebar-search"]}>
-            <div className={styles["sidebar-search-wrapper"]}>
-              <span className={styles["sidebar-search-icon"]}>
-                <Search />
-              </span>
-              <input
-                type="text"
-                placeholder="Search or add a place..."
-                value={searchQuery}
-                onChange={(e) => searchChangeHandler(e.target.value)}
-              />
-              {showDropdown && results.length > 0 && (
-                <SearchDropdown
-                  results={results}
-                  onSelect={selectResultHandler}
-                  onClose={closeDropdownHandler}
-                />
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* ---- Filter tabs ---- */}
       {newPlaceCoords === null && (
         <div className={styles["sidebar-filters"]}>
           {filterCategories.map((categ) => (
@@ -215,7 +302,6 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* ---- Sort controls ---- */}
       {newPlaceCoords === null && (
         <div className={styles["sidebar-sort"]}>
           <div className={styles["sidebar-sort-btns"]}>
@@ -261,40 +347,89 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* ---- Place cards ---- */}
       {newPlaceCoords !== null || editingPlaceId !== null ? (
         <div className={styles["sidebar-content"]}>
           <AddPlaceForm />
         </div>
       ) : (
         <div className={styles["sidebar-content"]}>
-          {filteredPlaces.map((place) => (
-            <PlaceCard key={place.id} place={place} />
-          ))}
-          {filteredPlaces.length === 0 && places.length === 0 && (
-            <div className={styles["popular-section"]}>
-              <div className={styles["popular-title"]}>
-                <span>Popular places</span>
-                <span className={styles["popular-subtitle"]}>
-                  Tap to add to your wishlist
-                </span>
-              </div>
-              <div className={styles["popular-list"]}>
-                {popularPlaces.map((pp) => (
-                  <PopularCard
-                    key={pp.title}
-                    place={pp}
-                    onSelect={selectPopularPlace}
-                  />
-                ))}
-              </div>
+          {filteredPlaces.length > 0 && (
+            <button
+              type="button"
+              className={styles["block-header"]}
+              onClick={() => setMyPlacesOpen((open) => !open)}
+              title={myPlacesOpen ? "Collapse" : "Expand"}
+            >
+              <span>My places</span>
+              {myPlacesOpen ? (
+                <ChevronDown size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              )}
+            </button>
+          )}
+          {myPlacesOpen &&
+            filteredPlaces.map((place) => (
+              <PlaceCard key={place.id} place={place} />
+            ))}
+
+          {groupedShared.length > 0 && (
+            <div className={styles["shared-section"]}>
+              {groupedShared.map((group) => {
+                const collapsed = collapsedGroups.has(group.groupId);
+                return (
+                  <div key={group.groupId} className={styles["shared-block"]}>
+                    <button
+                      type="button"
+                      className={styles["shared-heading"]}
+                      onClick={() => toggleGroup(group.groupId)}
+                      title={collapsed ? "Expand" : "Collapse"}
+                    >
+                      <span>{group.groupName}</span>
+                      {collapsed ? (
+                        <ChevronRight size={14} />
+                      ) : (
+                        <ChevronDown size={14} />
+                      )}
+                    </button>
+                    {!collapsed &&
+                      group.views.map((view) => (
+                        <SharedCard key={view.place.id} view={view} />
+                      ))}
+                  </div>
+                );
+              })}
             </div>
           )}
-          {filteredPlaces.length === 0 && places.length > 0 && (
-            <div className={styles["sidebar-empty"]}>
-              No places match your filters.
-            </div>
-          )}
+
+          {filteredPlaces.length === 0 &&
+            filteredShared.length === 0 &&
+            places.length === 0 && (
+              <div className={styles["popular-section"]}>
+                <div className={styles["popular-title"]}>
+                  <span>Popular places</span>
+                  <span className={styles["popular-subtitle"]}>
+                    Tap to add to your wishlist
+                  </span>
+                </div>
+                <div className={styles["popular-list"]}>
+                  {popularPlaces.map((pp) => (
+                    <PopularCard
+                      key={pp.title}
+                      place={pp}
+                      onSelect={selectPopularPlace}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          {filteredPlaces.length === 0 &&
+            filteredShared.length === 0 &&
+            places.length > 0 && (
+              <div className={styles["sidebar-empty"]}>
+                No places match your filters.
+              </div>
+            )}
         </div>
       )}
     </div>

@@ -19,7 +19,6 @@
   min-width: 60px;
 }
 
-/* ---- Heading / Top bar ---- */
 .sidebar-heading {
   padding: 20px 20px 0 20px;
 }
@@ -27,14 +26,9 @@
 .sidebar-heading-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 10px;
   margin-bottom: 16px;
-}
-
-.sidebar-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-h);
 }
 
 .toggle-btn {
@@ -62,9 +56,10 @@
   height: 24px;
 }
 
-/* ---- Search ---- */
 .sidebar-search {
-  margin-bottom: 16px;
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
 }
 
 .sidebar-search-wrapper {
@@ -108,7 +103,6 @@
   height: 16px;
 }
 
-/* ---- Filters ---- */
 .sidebar-filters {
   display: flex;
   flex-wrap: wrap;
@@ -142,7 +136,6 @@
   color: var(--accent);
 }
 
-/* ---- Sort controls ---- */
 .sidebar-sort {
   display: flex;
   padding: 10px 20px;
@@ -178,7 +171,6 @@
   color: var(--accent);
 }
 
-/* ---- Content (place cards) ---- */
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
@@ -200,8 +192,6 @@
   color: var(--text);
   opacity: 0.5;
 }
-
-/* ---- Popular places ---- */
 
 .popular-section {
   padding: 4px 6px 20px;
@@ -377,7 +367,67 @@
   color: var(--text);
 }
 
-/* ---- Bottom navigation ---- */
+.place-status.shared {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+}
+
+.block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 16px 8px 10px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.block-header:hover {
+  color: #6ee7b7;
+}
+
+.shared-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.shared-block {
+  margin-bottom: 16px;
+}
+
+.shared-block:last-child {
+  margin-bottom: 0;
+}
+
+.shared-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 0 8px 10px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #a855f7;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.shared-heading:hover {
+  color: #c084fc;
+}
+
 .sidebar-links {
   display: flex;
   border-top: 1px solid var(--border);
@@ -422,8 +472,6 @@
   height: 22px;
 }
 
-/* ---- Closed state ---- */
-.sidebarClosed .sidebar-heading-top .sidebar-title,
 .sidebarClosed .sidebar-search,
 .sidebarClosed .sidebar-filters,
 .sidebarClosed .sidebar-sort,

@@ -33,6 +33,11 @@ export function Header() {
               Profile
             </Link>
           </li>
+          {authUser && (
+            <li>
+              <Link to={"/groups"}>Groups</Link>
+            </li>
+          )}
           <li>
             {authUser ? (
               <button

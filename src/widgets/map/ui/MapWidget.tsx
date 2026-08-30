@@ -12,6 +12,7 @@ import { LocateFixed } from "lucide-react";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
 import L from "leaflet";
 import { PlaceMarkers } from "@/features/place-markers";
+import { useGroups } from "@/entities/group";
 import { useNavigate, useSearchParams } from "react-router";
 
 function LocationMarker() {
@@ -75,16 +76,19 @@ function MapClickHandler({
 function FlyToSelectedPlace() {
   const map = useMap();
   const { places } = usePlaces();
+  const { sharedPlaces } = useGroups();
   const [searchParams] = useSearchParams();
   const placeId = searchParams.get("placeId");
 
   const foundPlace = places.find((place) => place.id === placeId);
+  const foundShared = sharedPlaces.find((view) => view.place.id === placeId);
+  const targetPlace = foundPlace ?? foundShared?.place ?? null;
 
   useEffect(() => {
-    if (foundPlace) {
-      map.flyTo(foundPlace.coords, 15);
+    if (targetPlace) {
+      map.flyTo(targetPlace.coords, 15);
     }
-  }, [foundPlace, map]);
+  }, [targetPlace, map]);
 
   return null;
 }
