@@ -3,5 +3,12 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 24px;
+}
+
+@media (max-width: 480px) {
+  .authPage {
+    padding: 16px 12px;
+  }
 }

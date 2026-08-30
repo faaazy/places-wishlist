@@ -65,3 +65,13 @@
 .switchLink:hover {
   opacity: 0.85;
 }
+
+@media (max-width: 480px) {
+  .card {
+    padding: 24px 16px;
+  }
+
+  .tabs {
+    margin-bottom: 18px;
+  }
+}

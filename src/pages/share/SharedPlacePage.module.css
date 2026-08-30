@@ -159,3 +159,35 @@
   color: var(--text);
   margin: 8px 0 20px;
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .cardHeader {
+    flex-wrap: wrap;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px 12px;
+  }
+
+  .card {
+    padding: 16px 14px;
+  }
+
+  .centerBox {
+    padding: 40px 16px;
+  }
+}

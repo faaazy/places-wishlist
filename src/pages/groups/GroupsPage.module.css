@@ -192,3 +192,38 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .card {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px 12px;
+  }
+
+  .card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .cardActions {
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .createForm {
+    padding: 14px;
+  }
+}

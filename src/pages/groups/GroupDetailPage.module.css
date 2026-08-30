@@ -308,3 +308,55 @@
   margin: 0;
   padding: 6px 0;
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .card,
+  .section {
+    padding: 14px;
+  }
+
+  .renameRow {
+    flex-wrap: wrap;
+  }
+
+  .renameRow .input {
+    flex: 1 1 100%;
+  }
+
+  .addPlaceRow {
+    flex-wrap: wrap;
+  }
+
+  .addPlaceRow .select {
+    flex: 1 1 100%;
+  }
+
+  .memberRow,
+  .sharedRow {
+    flex-wrap: wrap;
+  }
+
+  .canEdit {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px 12px;
+  }
+
+  .primaryBtn,
+  .secondaryBtn,
+  .dangerBtn {
+    padding: 9px 12px;
+  }
+
+  .memberInfo {
+    flex-wrap: wrap;
+  }
+}

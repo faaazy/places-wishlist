@@ -81,3 +81,11 @@
   background: var(--bg-hover);
   color: var(--text-h);
 }
+
+@media (max-width: 480px) {
+  .toast {
+    bottom: 12px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+}

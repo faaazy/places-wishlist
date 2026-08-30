@@ -226,3 +226,21 @@
   color: #1a1d23;
   line-height: 1;
 }
+
+@media (max-width: 480px) {
+  .popup {
+    min-width: 200px;
+  }
+
+  .popupTitle {
+    font-size: 15px;
+  }
+
+  .popupDescription {
+    font-size: 12px;
+  }
+
+  .popupActions {
+    flex-wrap: wrap;
+  }
+}

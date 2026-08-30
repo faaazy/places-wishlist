@@ -170,3 +170,31 @@
 .primaryBtn:hover {
   opacity: 0.85;
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .cardTop {
+    flex-wrap: wrap;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px 12px;
+  }
+
+  .centerBox {
+    padding: 40px 16px;
+  }
+}

@@ -81,3 +81,13 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 480px) {
+  .page {
+    padding: 24px 12px;
+  }
+
+  .card {
+    padding: 22px 16px;
+  }
+}

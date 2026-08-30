@@ -5,6 +5,7 @@ import {
   ChevronRight,
   CircleChevronLeft,
   CircleChevronRight,
+  Menu,
   Search,
   Star,
 } from "lucide-react";
@@ -132,7 +133,7 @@ export function Sidebar() {
   const { places, newPlaceCoords, editingPlaceId, flyTo, showSearchPopup } =
     usePlaces();
   const { sharedPlaces } = useGroups();
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isOpen, setIsOpen] = useState<boolean>(() => window.innerWidth > 768);
   const [myPlacesOpen, setMyPlacesOpen] = useState<boolean>(true);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     () => new Set(),
@@ -251,10 +252,11 @@ export function Sidebar() {
   };
 
   return (
-    <div
-      className={`${styles.sidebar} ${isOpen ? styles.sidebarOpened : styles.sidebarClosed}`}
-    >
-      <UndoToast />
+    <>
+      <div
+        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpened : styles.sidebarClosed}`}
+      >
+        <UndoToast />
       <div className={styles["sidebar-heading"]}>
         <div className={styles["sidebar-heading-top"]}>
           {newPlaceCoords === null && (
@@ -433,5 +435,20 @@ export function Sidebar() {
         </div>
       )}
     </div>
+
+    {!isOpen && (
+        <button
+          type="button"
+          className={styles.mobileToggle}
+          onClick={() => setIsOpen(true)}
+          title="Open places"
+        >
+          <Menu size={22} />
+        </button>
+      )}
+      {isOpen && (
+        <div className={styles.overlay} onClick={() => setIsOpen(false)} />
+      )}
+    </>
   );
 }
