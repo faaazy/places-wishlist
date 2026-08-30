@@ -4,7 +4,14 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "./styles/index.css";
 import { MapPage } from "@/pages/map/MapPage";
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router";
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  RouterProvider,
+  useNavigate,
+} from "react-router";
+import { useEffect } from "react";
 import { Layout } from "@/widgets/layout";
 import {
   ProfilePage,
@@ -31,28 +38,50 @@ function RequireAuth() {
   return <Outlet />;
 }
 
+function RedirectHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const redirect = sessionStorage.getItem("redirect");
+    if (redirect) {
+      sessionStorage.removeItem("redirect");
+      navigate(redirect, { replace: true });
+    }
+  }, [navigate]);
+
+  return <Outlet />;
+}
+
 function App() {
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout />,
-      children: [
-        { path: "/", element: <MapPage /> },
-        { path: "/profile", element: <ProfilePage /> },
-        { path: "/auth", element: <AuthPage /> },
-        {
-          element: <RequireAuth />,
-          children: [
-            { path: "/groups", element: <GroupsPage /> },
-            { path: "/groups/:id", element: <GroupDetailPage /> },
-            { path: "/groups/join", element: <JoinGroupPage /> },
-          ],
-        },
-      ],
-    },
-    { path: "/share/place/:token", element: <SharedPlacePage /> },
-    { path: "/share/list/:token", element: <SharedListPage /> },
-  ]);
+  const router = createBrowserRouter(
+    [
+      {
+        element: <RedirectHandler />,
+        children: [
+          {
+            path: "/",
+            element: <Layout />,
+            children: [
+              { path: "/", element: <MapPage /> },
+              { path: "/profile", element: <ProfilePage /> },
+              { path: "/auth", element: <AuthPage /> },
+              {
+                element: <RequireAuth />,
+                children: [
+                  { path: "/groups", element: <GroupsPage /> },
+                  { path: "/groups/:id", element: <GroupDetailPage /> },
+                  { path: "/groups/join", element: <JoinGroupPage /> },
+                ],
+              },
+            ],
+          },
+          { path: "/share/place/:token", element: <SharedPlacePage /> },
+          { path: "/share/list/:token", element: <SharedListPage /> },
+        ],
+      },
+    ],
+    { basename: import.meta.env.BASE_URL },
+  );
 
   return (
     <AuthContextProvider>

@@ -4,6 +4,7 @@ import { Link2, Loader2, X } from "lucide-react";
 import type { Place } from "@/entities/place/model/types";
 import { useGroups } from "@/entities/group";
 import { supabase } from "@/shared/lib/supabase";
+import { withBase } from "@/shared/lib/url";
 import { Link } from "react-router";
 import styles from "./SharePlaceModal.module.css";
 
@@ -64,7 +65,7 @@ export function SharePlaceModal({ place, onClose }: SharePlaceModalProps) {
       const token = await setPlacePublic(place.id, on);
       setPublicToken(token);
       if (on && token) {
-        const url = `${window.location.origin}/share/place/${token}`;
+        const url = withBase(`share/place/${token}`);
         await copy(url, "link");
       }
     } finally {
@@ -99,7 +100,7 @@ export function SharePlaceModal({ place, onClose }: SharePlaceModalProps) {
 
   const publicLink =
     publicToken !== undefined && publicToken !== null
-      ? `${window.location.origin}/share/place/${publicToken}`
+      ? withBase(`share/place/${publicToken}`)
       : null;
 
   return createPortal(

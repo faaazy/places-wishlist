@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PlacesWishlist</title>
+    <script>
+      (function () {
+        var segment = location.pathname.split("/")[1] || "";
+        var home = "/" + segment + "/";
+        var rest = location.pathname.slice(segment ? segment.length + 1 : 1);
+        if (rest && rest !== "/" && rest.indexOf("/index.html") !== 0) {
+          sessionStorage.setItem(
+            "redirect",
+            rest + location.search + location.hash,
+          );
+        }
+        location.replace(home);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

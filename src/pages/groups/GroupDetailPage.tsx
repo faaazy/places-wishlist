@@ -12,6 +12,7 @@ import {
 import { useGroups, type GroupMember } from "@/entities/group";
 import { useAuth } from "@/entities/auth/model/AuthContext";
 import { usePlaces } from "@/entities/place/model/PlaceContext";
+import { withBase } from "@/shared/lib/url";
 import styles from "./GroupDetailPage.module.css";
 
 export function GroupDetailPage() {
@@ -92,12 +93,12 @@ export function GroupDetailPage() {
     (m) => m.user_id === authUser?.id && m.role === "admin",
   );
 
-  const inviteUrl = group.invite_token
-    ? `${window.location.origin}/groups/join?token=${group.invite_token}`
+const inviteUrl = group.invite_token
+    ? withBase(`groups/join?token=${group.invite_token}`)
     : null;
 
-  const listUrl = group.share_token
-    ? `${window.location.origin}/share/list/${group.share_token}`
+const listUrl = group.share_token
+    ? withBase(`share/list/${group.share_token}`)
     : null;
 
   const copy = async (url: string | null, key: string) => {
@@ -126,7 +127,7 @@ export function GroupDetailPage() {
     setBusy("invite");
     try {
       const token = await regenerateInvite(group.id);
-      await copy(`${window.location.origin}/groups/join?token=${token}`, "invite");
+      await copy(withBase(`groups/join?token=${token}`), "invite");
     } finally {
       setBusy(null);
     }
@@ -137,10 +138,7 @@ export function GroupDetailPage() {
     try {
       const token = await setGroupPublic(group.id, isPublic);
       if (isPublic && token) {
-        await copy(
-          `${window.location.origin}/share/list/${token}`,
-          "public",
-        );
+        await copy(withBase(`share/list/${token}`), "public");
       }
     } finally {
       setBusy(null);

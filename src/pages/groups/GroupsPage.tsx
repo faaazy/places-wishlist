@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Link2, Loader2, Plus, Trash2, Users } from "lucide-react";
 import { useGroups } from "@/entities/group";
+import { withBase } from "@/shared/lib/url";
 import styles from "./GroupsPage.module.css";
 
 export function GroupsPage() {
@@ -31,7 +32,7 @@ export function GroupsPage() {
 
   const copyInvite = async (inviteToken: string | null) => {
     if (!inviteToken) return;
-    const url = `${window.location.origin}/groups/join?token=${inviteToken}`;
+    const url = withBase(`groups/join?token=${inviteToken}`);
     try {
       await navigator.clipboard.writeText(url);
     } catch {
