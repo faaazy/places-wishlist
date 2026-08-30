@@ -64,8 +64,6 @@ export const PlaceContextProvider = ({
 
   const { authUser } = useAuth();
   const isAuthenticated = authUser !== null;
-  const wasAuthenticatedRef = useRef(isAuthenticated);
-  const lastCloudPlacesRef = useRef<Place[]>([]);
 
   const loadPlaces = useCallback(async () => {
     if (isAuthenticated) {
@@ -86,7 +84,6 @@ export const PlaceContextProvider = ({
         status: row.status,
         createdAt: row.created_at,
       }));
-      lastCloudPlacesRef.current = loaded;
       setPlaces(loaded);
     } else {
       setPlaces(getPlaces());
@@ -105,13 +102,8 @@ export const PlaceContextProvider = ({
         } else if (!migrated) {
           await migrateLocalPlaces(authUser.id);
         }
-      } else {
-        if (wasAuthenticatedRef.current && lastCloudPlacesRef.current.length > 0) {
-          savePlaces(lastCloudPlacesRef.current);
-        }
       }
 
-      wasAuthenticatedRef.current = isAuthenticated;
       loadPlaces();
     }
 

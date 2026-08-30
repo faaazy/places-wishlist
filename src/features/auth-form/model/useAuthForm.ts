@@ -1,6 +1,6 @@
 import { useAuth } from "@/entities/auth/model/AuthContext";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 type signInData = { email: string; password: string };
 type signUpData = { name: string; email: string; password: string };
@@ -10,6 +10,8 @@ export const useAuthForm = () => {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const next = searchParams.get("next");
 
   const { signIn, signUp } = useAuth();
 
@@ -18,7 +20,7 @@ export const useAuthForm = () => {
     setError(null);
 
     signIn(data.email, data.password)
-      .then(() => navigate("/"))
+      .then(() => navigate(next || "/"))
       .catch((err) => setError(err.message))
       .finally(() => setIsSubmitting(false));
   };
@@ -26,10 +28,9 @@ export const useAuthForm = () => {
   const authFormSignUp = (data: signUpData) => {
     setIsSubmitting(true);
     setError(null);
-    // console.log(123);
 
     signUp(data.name, data.email, data.password)
-      .then(() => navigate("/"))
+      .then(() => navigate(next || "/"))
       .catch((err) => setError(err.message))
       .finally(() => setIsSubmitting(false));
   };

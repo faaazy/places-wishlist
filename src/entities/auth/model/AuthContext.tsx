@@ -55,7 +55,16 @@ export const AuthContextProvider = ({
     if (error) throw error;
 
     if (data.user) {
-      await createUserProfile(data.user.id, name);
+      createUserProfile(data.user.id, name).catch((err) => {
+        console.warn("createUserProfile fallback failed:", err);
+      });
+    }
+
+    if (!data.session) {
+      try {
+        await supabase.auth.signOut();
+      } catch {}
+      throw new Error("Account created. Confirm your email, then sign in.");
     }
   };
 
