@@ -1,73 +1,102 @@
-# React + TypeScript + Vite
+# PlacesWishlist
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A travel wishlist in the form of a map. Add the places you want to visit, rate how much you want to go there, keep track of what you have already seen, and share lists with friends.
 
-Currently, two official plugins are available:
+Click anywhere on the map - a place is born. Add a name, a description, a category and a 1-5 star rating. Later you go there, mark it as visited, and that is it. The whole "some day I will go" pile now lives in one place.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+It works without an account: guest data lives in localStorage. Sign in and everything moves to Supabase, available on any device. Auth and cloud storage run on Supabase, so enabling them requires a Supabase project - see [Run your own instance](#run-your-own-instance).
 
-## React Compiler
+## Live app
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+[faaazy.github.io/places-wishlist](https://faaazy.github.io/places-wishlist/)
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Click on the map to open the "add place" form: title, description, category, wish rating.
+- Color-coded markers per category. Clicking a marker opens a popup with description, stars, status buttons and delete/edit.
+- Sidebar with search, category filters and sorting by date or rating.
+- Every place has a link: `?placeId=...` jumps straight to its marker.
+- Statuses: wishlist -> visited / skipped. Deletion can be undone.
+- Browser geolocation with a single button ("my location").
+- Smart search: matches titles, coordinates, and real places/addresses through Nominatim.
+- A set of popular places to bootstrap your wishlist in one tap.
+- Auth via Supabase (email + password). Guests are full-fledged users except their data stays local.
+- Profile: name, bio, avatar (resized client-side before upload).
+- Groups: create, invite by link, manage members, admin powers, leave or delete.
+- Sharing: a single place or an entire group list behind a public link (`/share/place/:token`, `/share/list/:token`).
+- Group owners can grant edit rights on shared places ("can edit") and revoke them.
+- Places you shared yourself are not duplicated on the map, but their popup shows which groups they live in.
+- Duplicate guards: identical title + description cannot be shared into the same group, and adding an existing place warns first.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Place categories
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Category  | What it covers                     |
+| --------- | ---------------------------------- |
+| nature    | mountains, parks, landscapes       |
+| city      | streets, viewpoints, urban areas   |
+| food      | cafes, restaurants, local eats     |
+| culture   | museums, architecture, events      |
+| adventure | outdoor activities, thrill rides   |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Tech stack
+
+| Layer       | Technology                                           |
+| ----------- | ---------------------------------------------------- |
+| Frontend    | React 19, TypeScript, Vite                           |
+| Routing     | React Router v7                                      |
+| Map         | Leaflet, react-leaflet, markercluster                |
+| Auth + DB   | Supabase (Auth, Postgres, RLS)                       |
+| Place search| Nominatim (OpenStreetMap)                            |
+| Icons       | lucide-react                                         |
+| Styling     | CSS Modules                                          |
+| Fonts       | Inter Variable, JetBrains Mono Variable              |
+
+## Run your own instance
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Guest mode works without any backend - data stays in the browser's localStorage. To enable sign-in, cross-device sync and sharing, the app needs a Supabase project:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Create a project, open Settings -> API and copy the URL and publishable key.
+2. Add them to the environment:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
+
+3. Open SQL Editor and run `supabase/sharing.sql`. It creates the tables (`users`, `places`, `groups`, `group_members`, `shared_places`), RLS policies, the `create_group` / `join_group` RPCs and the profile trigger. The file is idempotent, so re-running it is safe.
+
+Note: `auth.users` and the `public.users` table are different things. The `handle_new_user()` trigger in `sharing.sql` creates the profile row on registration - a fresh account has no profile until it fires.
+
+## Project structure
+
+Feature-Sliced-Design inspired, but kept pragmatic.
+
+```
+src/
+  app/          entry point, routing, global styles
+  entities/     domain models: auth, place, user, group
+  features/     features: add place, markers, sharing, auth form
+  pages/        pages: map, profile, auth, groups, share
+  widgets/      map, sidebar, header, layout
+  shared/       utilities, small UI bits, geocoding
+supabase/
+  sharing.sql   full DB schema, RLS, RPC, trigger
+```
+
+## Scripts
+
+| Command            | What it does                        |
+| ------------------ | ----------------------------------- |
+| `npm run dev`      | dev server with HMR                 |
+| `npm run build`    | production build into `dist`        |
+| `npm run lint`     | eslint across the project           |
+| `npm run preview`  | preview the built `dist` locally    |
+
+## Deployment
+
+It is a static app: `npm run build` produces a `dist` folder that drops onto Vercel, Netlify or Cloudflare Pages. Point the host's environment variables to the same two Supabase keys.
