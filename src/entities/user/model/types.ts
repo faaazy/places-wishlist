@@ -4,5 +4,4 @@ export interface UserProfile {
   avatar_url: string;
   bio: string;
   created_at: string;
-  // probably something else
 }

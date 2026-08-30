@@ -25,7 +25,7 @@ export function usePlaceSearch(query: string) {
     }
 
     debounceTimerRef.current = setTimeout(async () => {
-      const coords = parseCoords(query); // ???
+      const coords = parseCoords(query);
 
       if (coords) {
         const apiResults = await reverseGeocode(coords.lat, coords.lon);

@@ -33,7 +33,6 @@
   border-color: #34d399;
 }
 
-/* Leaflet zoom controls */
 :global(.leaflet-control-zoom) {
   border: none !important;
   border-radius: 10px !important;
@@ -61,7 +60,6 @@
   border-bottom: none !important;
 }
 
-/* Click popup */
 .clickPopup {
   text-align: center;
 }

@@ -12,8 +12,6 @@
   max-width: 580px;
 }
 
-/* ---- Header ---- */
-
 .header {
   display: flex;
   align-items: center;
@@ -87,8 +85,6 @@
   margin: 0;
 }
 
-/* ---- Card ---- */
-
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -103,8 +99,6 @@
   color: var(--text-h);
   margin: 0 0 16px;
 }
-
-/* ---- Edit locked (guest) ---- */
 
 .editLocked {
   display: flex;
@@ -128,8 +122,6 @@
   color: var(--text);
   line-height: 1.5;
 }
-
-/* ---- Form ---- */
 
 .field {
   margin-bottom: 16px;
@@ -216,8 +208,6 @@
   background: var(--bg-hover);
   color: var(--text-h);
 }
-
-/* ---- Stats ---- */
 
 .statsRow {
   display: flex;
